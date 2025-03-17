@@ -1,11 +1,79 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+import Layout from "../layouts/Layout.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Obtener token del localStorage (solo cliente)
+const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token');
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Bienvenido a MyFinances">
+  <main class="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12">
+    <section class="max-w-4xl mx-auto px-4">
+      {hasToken ? (
+        <!-- Contenido para usuarios autenticados -->
+        <div class="text-center">
+          <h1 class="text-4xl font-bold text-blue-600 mb-4">
+            ¡Bienvenido de vuelta!
+          </h1>
+          <a 
+            href="/dashboard" 
+            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Ir al Dashboard
+          </a>
+        </div>
+      ) : (
+	  <!-- Contenido para usuarios no autenticados -->
+        <div class="text-center">
+          <h1 class="text-4xl font-bold text-blue-600 mb-4">
+            Bienvenido a MyFinances
+          </h1>
+          <p class="text-xl text-gray-600 mb-8">
+            Tu solución para la gestión financiera personal
+          </p>
+          
+          <div class="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+              <div class="mb-4">
+                <span class="text-5xl">👋</span>
+              </div>
+              <h2 class="text-2xl font-semibold mb-3">¿Ya tienes cuenta?</h2>
+              <p class="text-gray-500 mb-4">Inicia sesión para acceder a tu panel de control</p>
+              <a 
+                href="/login" 
+                class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Iniciar Sesión
+              </a>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+              <div class="mb-4">
+                <span class="text-5xl">🚀</span>
+              </div>
+              <h2 class="text-2xl font-semibold mb-3">¿Nuevo aquí?</h2>
+              <p class="text-gray-500 mb-4">Crea una cuenta para empezar a gestionar tus finanzas</p>
+              <a 
+                href="/register" 
+                class="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Crear Cuenta
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  </main>
 </Layout>
+
+<!-- Script para manejar la autenticación del lado del cliente -->
+<script>
+  // Actualizar el estado al cargar la página
+  window.addEventListener('load', () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = '/dashboard'; // Redirigir si está autenticado
+    }
+  });
+</script>

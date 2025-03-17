@@ -1,0 +1,15 @@
+---
+import "../styles/global.css";
+import LoginForm from "../components/LoginForm.jsx";
+import Layout from "../layouts/Layout.astro";
+import SectionContainer from "../components/SectionContainer.astro";
+import ErrorBoundary from "../components/ErrorBoundary.jsx";
+---
+
+<Layout title="Iniciar Sesión - Finances">
+  <SectionContainer id="login">
+    <ErrorBoundary>
+      <LoginForm client:load />
+    </ErrorBoundary>
+  </SectionContainer>
+</Layout>

@@ -1,0 +1,19 @@
+---
+import "../styles/global.css";
+import Layout from '../layouts/Layout.astro';
+import SectionContainer from '../components/SectionContainer.astro';
+import ErrorBoundary from '../components/ErrorBoundary.jsx';
+import ViewSelector from '../components/ViewSelector.jsx';
+---
+
+<Layout title="Reportes - Finances">
+  <SectionContainer id="reports">
+    <ErrorBoundary>
+        <h1 class="text-3xl font-bold mb-4">Mis Reportes</h1>
+        
+        <!-- Componente selector de vista -->
+        <ViewSelector client:load />
+        
+    </ErrorBoundary>
+  </SectionContainer>
+</Layout>
