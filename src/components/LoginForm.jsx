@@ -24,8 +24,8 @@ export default function LoginForm() {
       // Aquí podrías guardar el token en localStorage o en un contexto global
       localStorage.setItem("token", data.token);
       console.log("Token recibido:", data.token);
-      // Redirige al usuario a la página de reportes
-      window.location.href = "/reports";
+      // Redirige al usuario a la página de dashboard
+      window.location.href = "/dashboard";
     } catch (error) {
       setMessage(error.message);
     }

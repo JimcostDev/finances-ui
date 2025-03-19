@@ -1,8 +1,9 @@
-const API_BASE_URL = "http://localhost:3000"//"https://finances.koyeb.app";
+const API_BASE_URL = "https://finances.koyeb.app";
+// const API_BASE_URL = "http://localhost:3000";
 
 // Función para registrar un usuario
 export async function registerUser(userData) {
-  const response = await fetch(`${API_BASE_URL}/api/register`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -18,7 +19,7 @@ export async function registerUser(userData) {
 
 // Función para iniciar sesión
 export async function loginUser(credentials) {
-  const response = await fetch(`${API_BASE_URL}/api/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -32,11 +33,7 @@ export async function loginUser(credentials) {
   return await response.json();
 }
 
-/**
- * Obtiene todos los reportes del usuario autenticado.
- * @param {string} token - Token de autenticación JWT.
- * @returns {Promise<Array>} - Una promesa que resuelve a la lista de reportes.
- */
+// Función para obtener los reportes
 export async function fetchReports(token) {
     const response = await fetch(`${API_BASE_URL}/api/reports`, {
       headers: {
@@ -51,13 +48,7 @@ export async function fetchReports(token) {
     return await response.json();
   }
 
-  /**
- * Obtiene los reportes filtrados por mes y año.
- * @param {string} month - Mes en formato texto (ej. "marzo").
- * @param {number} year - Año (ej. 2025).
- * @param {string} token - Token de autenticación JWT.
- * @returns {Promise<Array>} - Lista de reportes.
- */
+// Función para obtener los reportes por mes
 export async function fetchReportsByMonth(month, year, token) {
     const response = await fetch(`${API_BASE_URL}/api/reports/by-month?month=${month}&year=${year}`, {
       headers: {
@@ -71,3 +62,24 @@ export async function fetchReportsByMonth(month, year, token) {
     }
     return await response.json();
   }
+
+// Función para obtner usuarios
+export async function fetchUserProfile(token) {
+  const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",  
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));  // Captura errores JSON
+    console.error("Error en fetchUserProfile:", errorData);
+    throw new Error(errorData.error || `Error ${response.status}: No se pudo obtener el perfil`);
+  }
+
+  return await response.json();
+}
+
+  
