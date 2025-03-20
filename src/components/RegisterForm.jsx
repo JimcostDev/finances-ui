@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { registerUser } from "../utils/api";
+import Title from "./Title";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -22,7 +23,6 @@ export default function RegisterForm() {
     e.preventDefault();
     setMessage({ text: "", type: "" });
 
-    // Validación de contraseñas
     if (form.password !== form.confirm_password) {
       setMessage({ text: "Las contraseñas no coinciden", type: "error" });
       return;
@@ -35,7 +35,6 @@ export default function RegisterForm() {
         type: "success"
       });
       
-      // Redirigir después de 1.5 segundos
       setTimeout(() => {
         window.location.href = "/login";
       }, 1500);
@@ -46,83 +45,104 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-      <div>
-        <label className="block font-medium">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block font-medium">Nombre de usuario</label>
-        <input
-          type="text"
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block font-medium">Nombre completo</label>
-        <input
-          type="text"
-          name="fullname"
-          value={form.fullname}
-          onChange={handleChange}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block font-medium">Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block font-medium">Confirmar contraseña</label>
-        <input
-          type="password"
-          name="confirm_password"
-          value={form.confirm_password}
-          onChange={handleChange}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-100">
+        <Title as="h2" className="mb-8 text-center">Registro de Usuario</Title>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="ejemplo@email.com"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre de usuario
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="nombredeusuario"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre completo
+            </label>
+            <input
+              type="text"
+              name="fullname"
+              value={form.fullname}
+              onChange={handleChange}
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="Juan Pérez"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirmar contraseña
+            </label>
+            <input
+              type="password"
+              name="confirm_password"
+              value={form.confirm_password}
+              onChange={handleChange}
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="••••••••"
+              required
+            />
+          </div>
 
-      <button 
-        type="submit" 
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-      >
-        Registrar
-      </button>
-      
-      {message.text && (
-        <div className={`p-3 rounded-lg ${
-          message.type === "error" 
-            ? "bg-red-100 text-red-700" 
-            : "bg-green-100 text-green-700"
-        }`}>
-          {message.text}
-        </div>
-      )}
-    </form>
+          <button 
+            type="submit" 
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          >
+            Registrar cuenta
+          </button>
+          
+          {message.text && (
+            <div className={`mt-4 p-4 rounded-lg text-sm ${
+              message.type === "error" 
+                ? "bg-red-50 text-red-600"
+                : "bg-green-50 text-green-600"
+            }`}>
+              {message.text}
+            </div>
+          )}
+        </form>
+      </div>
+    </div>
   );
 }

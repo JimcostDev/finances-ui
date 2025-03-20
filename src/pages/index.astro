@@ -2,60 +2,71 @@
 import '../styles/global.css';
 import Layout from "../layouts/Layout.astro";
 
-// Obtener token del localStorage (solo cliente)
 const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token');
 ---
 
 <Layout title="Bienvenido a MyFinances">
-  <main class="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12">
-    <section class="max-w-4xl mx-auto px-4">
+  <main class="min-h-screen bg-gray-50 py-12">
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {hasToken ? (
         <!-- Contenido para usuarios autenticados -->
-        <div class="text-center">
-          <h1 class="text-4xl font-bold text-blue-600 mb-4">
+        <div class="text-center space-y-8">
+          <h1 class="text-4xl font-bold text-gray-900 mb-4">
             ¡Bienvenido de vuelta!
           </h1>
-          <a 
-            href="/dashboard" 
-            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Ir al Dashboard
-          </a>
+          <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200">
+            <a 
+              href="/dashboard" 
+              class="inline-block w-full bg-green-600 text-white px-8 py-3.5 rounded-lg text-lg font-medium hover:bg-green-700 transition-colors"
+            >
+              Ir al Dashboard
+            </a>
+          </div>
         </div>
       ) : (
-	  <!-- Contenido para usuarios no autenticados -->
-        <div class="text-center">
-          <h1 class="text-4xl font-bold text-blue-600 mb-4">
-            Bienvenido a MyFinances
-          </h1>
-          <p class="text-xl text-gray-600 mb-8">
-            Tu solución para la gestión financiera personal
-          </p>
+        <!-- Contenido para usuarios no autenticados -->
+        <div class="text-center space-y-8">
+          <div class="space-y-4">
+            <h1 class="text-4xl font-bold text-gray-900">
+              MyFinances
+            </h1>
+            <p class="text-xl text-gray-600">
+              Gestión financiera personalizada y segura
+            </p>
+          </div>
           
-          <div class="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <div class="mb-4">
-                <span class="text-5xl">👋</span>
+          <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
+              <div class="mb-6">
+                <span class="text-6xl">📊</span>
               </div>
-              <h2 class="text-2xl font-semibold mb-3">¿Ya tienes cuenta?</h2>
-              <p class="text-gray-500 mb-4">Inicia sesión para acceder a tu panel de control</p>
+              <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                ¿Ya tienes cuenta?
+              </h2>
+              <p class="text-gray-500 mb-6">
+                Gestiona tus reportes financieros con tu cuenta registrada
+              </p>
               <a 
                 href="/login" 
-                class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                class="inline-block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Iniciar Sesión
               </a>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <div class="mb-4">
-                <span class="text-5xl">🚀</span>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
+              <div class="mb-6">
+                <span class="text-6xl">✨</span>
               </div>
-              <h2 class="text-2xl font-semibold mb-3">¿Nuevo aquí?</h2>
-              <p class="text-gray-500 mb-4">Crea una cuenta para empezar a gestionar tus finanzas</p>
+              <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                ¿Nuevo por aquí?
+              </h2>
+              <p class="text-gray-500 mb-6">
+                Empieza a controlar tus finanzas en menos de 2 minutos
+              </p>
               <a 
                 href="/register" 
-                class="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                class="inline-block w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
               >
                 Crear Cuenta
               </a>
@@ -67,13 +78,10 @@ const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token'
   </main>
 </Layout>
 
-<!-- Script para manejar la autenticación del lado del cliente -->
 <script>
-  // Actualizar el estado al cargar la página
-  window.addEventListener('load', () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      window.location.href = '/dashboard'; // Redirigir si está autenticado
+  window.addEventListener('DOMContentLoaded', () => {
+    if(typeof window !== 'undefined' && localStorage.getItem('token')) {
+      window.location.href = '/dashboard';
     }
   });
 </script>

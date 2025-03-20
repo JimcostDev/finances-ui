@@ -2,13 +2,14 @@
 import "../styles/global.css";
 import Layout from '../layouts/Layout.astro';
 import SectionContainer from '../components/SectionContainer.astro';
-import UserProfile from '../components/UserProfile.jsx';
-import ErrorBoundary from "../components/ErrorBoundary";
+import ErrorBoundary from "../components/ErrorBoundary.jsx";
+import DashboardLayout from "../components/DashboardLayout.jsx";
 ---
-<Layout title="Registro - Finances">
+<Layout title="Dashboard - Finances">
     <SectionContainer id="dashboard">
         <ErrorBoundary>
-            <UserProfile client:load/>
+            <DashboardLayout client:load>
+            </DashboardLayout>
         </ErrorBoundary>
     </SectionContainer>
 </Layout>
