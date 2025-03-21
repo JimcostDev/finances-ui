@@ -6,12 +6,14 @@ import UserProfile from "./UserProfile";
 import LogoutIcon from "./icons/Logout";
 import Title from "./Title";
 import SidebarButton from "./SidebarButton";
+import CreateReportForm from "./CreateReportForm";
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentView, setCurrentView] = useState("reports");
+  const [selectedReportId, setSelectedReportId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -43,8 +45,12 @@ export default function Dashboard() {
     switch (currentView) {
       case "reports":
         return <ViewSelector />;
+      case 'create-report':
+          return <CreateReportForm />;
       case "user":
         return <UserProfile />;
+      case 'edit-report':
+          return <EditReportForm />;
       default:
         return <ReportsByMonth />;
     }
@@ -93,9 +99,20 @@ export default function Dashboard() {
             onClick={setCurrentView}
             icon="📊"
             className="hover:bg-gray-50"
+            hasSubmenu
           >
             Reportes
           </SidebarButton>
+          {currentView === "reports" && (
+            <div className="ml-8 space-y-2 mt-2">
+              <button
+                onClick={() => setCurrentView("create-report")}
+                className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+              >
+                ➕ Crear Reporte
+              </button>
+            </div>
+          )}
 
           <SidebarButton
             view="user"
@@ -134,7 +151,7 @@ export default function Dashboard() {
             {currentView === "reports" && "Reportes Financieros"}
             {currentView === "user" && "Configuración de Perfil"}
           </Title>
-            {renderContent()}
+          {renderContent()}
         </div>
       </div>
     </div>

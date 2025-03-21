@@ -1,0 +1,14 @@
+---
+import '../../styles/global.css';
+import Layout from '../../layouts/Layout.astro';
+import EditReportForm from '../../components/EditReportForm.jsx';
+import SectionContainer from '../../components/SectionContainer.astro';
+const { id } = Astro.params;
+//console.log('ID de reporte - page:', id);
+---
+
+<Layout title="Editar Reporte">
+    <SectionContainer id="edit-report">
+        <EditReportForm client:load reportId={id} />
+    </SectionContainer>
+</Layout>

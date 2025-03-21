@@ -66,7 +66,21 @@ export default function ReportsList() {
 
         <ul className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
           {reports.map((report) => (
-            <li className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <li
+              key={report.id}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative" // Añadido 'relative'
+            >
+              {/* Botón de edición - Nueva sección */}
+              <div className="absolute top-4 right-4">
+                <a
+                  href={`/edit-report/${report.id}`}
+                  className="px-4 py-2.5  bg-green-50 text-yellow-700  rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
+                >
+                  Editar
+                </a>
+              </div>
+
+              {/* Sección del título existente */}
               <div className="mb-6 pb-4 border-b border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900">
                   {report.month.charAt(0).toUpperCase() + report.month.slice(1)}{" "}
@@ -81,7 +95,7 @@ export default function ReportsList() {
                       Ingreso Bruto
                     </p>
                     <p className="text-xl font-bold text-green-800">
-                      ${report.total_ingreso_bruto.toFixed(2)}
+                      ${report.total_ingreso_bruto}
                     </p>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-lg">
@@ -89,7 +103,7 @@ export default function ReportsList() {
                       Ingresos Netos
                     </p>
                     <p className="text-xl font-bold text-blue-800">
-                      ${report.ingresos_netos.toFixed(2)}
+                      ${report.ingresos_netos}
                     </p>
                   </div>
                 </div>
@@ -101,7 +115,7 @@ export default function ReportsList() {
                       Total Gastos
                     </p>
                     <p className="text-xl font-bold text-red-800">
-                      ${report.total_gastos.toFixed(2)}
+                      ${report.total_gastos}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
@@ -109,7 +123,7 @@ export default function ReportsList() {
                       Liquidación Final
                     </p>
                     <p className="text-xl font-bold text-purple-800">
-                      ${report.liquidacion.toFixed(2)}
+                      ${report.liquidacion}
                     </p>
                   </div>
                 </div>
@@ -119,21 +133,17 @@ export default function ReportsList() {
               <div className="mt-6 pt-4 border-t border-gray-200 grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Diezmos</p>
-                  <p className="font-medium text-gray-900">
-                    ${report.diezmos.toFixed(2)}
-                  </p>
+                  <p className="font-medium text-gray-900">${report.diezmos}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Ofrendas</p>
                   <p className="font-medium text-gray-900">
-                    ${report.ofrendas.toFixed(2)}
+                    ${report.ofrendas}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Iglesia</p>
-                  <p className="font-medium text-gray-900">
-                    ${report.iglesia.toFixed(2)}
-                  </p>
+                  <p className="font-medium text-gray-900">${report.iglesia}</p>
                 </div>
               </div>
             </li>

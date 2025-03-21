@@ -1,0 +1,12 @@
+---
+import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import CreateReportForm from '../components/CreateReportForm.jsx';
+import SectionContainer from '../components/SectionContainer.astro';
+---
+
+<Layout title="Crear Reporte">
+  <SectionContainer id="login">
+    <CreateReportForm client:load />
+  </SectionContainer>
+</Layout>

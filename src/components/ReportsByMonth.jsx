@@ -145,8 +145,19 @@ export default function ReportsByMonth() {
               </Title>
               <ul className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
                 {reports.map((report) => (
-                  // En ReportsList.jsx
-                  <li className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                  <li
+                    key={report.id}
+                    className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
+                  >
+                    {/* Botón de edición */}
+                    <div className="absolute top-4 right-4">
+                      <a
+                        href={`/edit-report/${report.id}`}
+                        className="px-4 py-2.5  bg-green-50 text-yellow-700  rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
+                      >
+                        Editar
+                      </a>
+                    </div>
                     <div className="mb-6 pb-4 border-b border-gray-200">
                       <h3 className="text-xl font-bold text-gray-900">
                         {report.month.charAt(0).toUpperCase() +
@@ -162,7 +173,7 @@ export default function ReportsByMonth() {
                             Ingreso Bruto
                           </p>
                           <p className="text-xl font-bold text-green-800">
-                            ${report.total_ingreso_bruto.toFixed(2)}
+                            ${report.total_ingreso_bruto}
                           </p>
                         </div>
                         <div className="bg-blue-50 p-4 rounded-lg">
@@ -170,7 +181,7 @@ export default function ReportsByMonth() {
                             Ingresos Netos
                           </p>
                           <p className="text-xl font-bold text-blue-800">
-                            ${report.ingresos_netos.toFixed(2)}
+                            ${report.ingresos_netos}
                           </p>
                         </div>
                       </div>
@@ -182,7 +193,7 @@ export default function ReportsByMonth() {
                             Total Gastos
                           </p>
                           <p className="text-xl font-bold text-red-800">
-                            ${report.total_gastos.toFixed(2)}
+                            ${report.total_gastos}
                           </p>
                         </div>
                         <div className="bg-purple-50 p-4 rounded-lg">
@@ -190,7 +201,7 @@ export default function ReportsByMonth() {
                             Liquidación Final
                           </p>
                           <p className="text-xl font-bold text-purple-800">
-                            ${report.liquidacion.toFixed(2)}
+                            ${report.liquidacion}
                           </p>
                         </div>
                       </div>
@@ -201,19 +212,19 @@ export default function ReportsByMonth() {
                       <div>
                         <p className="text-sm text-gray-600">Diezmos</p>
                         <p className="font-medium text-gray-900">
-                          ${report.diezmos.toFixed(2)}
+                          ${report.diezmos}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Ofrendas</p>
                         <p className="font-medium text-gray-900">
-                          ${report.ofrendas.toFixed(2)}
+                          ${report.ofrendas}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Iglesia</p>
                         <p className="font-medium text-gray-900">
-                          ${report.iglesia.toFixed(2)}
+                          ${report.iglesia}
                         </p>
                       </div>
                     </div>
