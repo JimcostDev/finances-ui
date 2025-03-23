@@ -153,7 +153,7 @@ export default function ReportsByMonth() {
                     <div className="absolute top-4 right-4">
                       <a
                         href={`/edit-report/${report.id}`}
-                        className="px-4 py-2.5  bg-green-50 text-yellow-700  rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
+                        className="px-4 py-2.5  bg-amber-50 text-yellow-700  rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
                       >
                         Editar
                       </a>
