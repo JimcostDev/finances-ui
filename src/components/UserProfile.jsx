@@ -3,9 +3,9 @@ import { fetchUserProfile } from '../utils/api';
 import Title from './Title';
 
 const ProfileItem = ({ label, value }) => (
-  <div className="flex justify-between items-center p-4 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-    <span className="text-sm font-medium text-gray-600">{label}</span>
-    <span className="text-md font-semibold text-gray-900">{value}</span>
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+    <span className="text-sm font-medium text-gray-600">{label}:</span>
+    <span className="mt-1 sm:mt-0 text-base font-semibold text-gray-900">{value}</span>
   </div>
 );
 
@@ -61,11 +61,13 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div className="py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-xl shadow-md border border-gray-100">
-          <div className="p-4 border-b border-gray-200">
-            <Title as="h2" className="text-center">Perfil de Usuario</Title>
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <Title as="h2" className="text-center text-2xl font-bold">
+              Perfil de Usuario
+            </Title>
           </div>
           
           <div className="divide-y divide-gray-100">
@@ -83,18 +85,12 @@ export default function UserProfile() {
             />
             <ProfileItem 
               label="Miembro desde" 
-              value={
-                <span className="flex items-center gap-2">
-                  <span>
-                    {new Date(userData.created_at).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      timeZone: 'UTC'
-                    })}
-                  </span>
-                </span>
-              }
+              value={new Date(userData.created_at).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'UTC'
+              })}
             />
           </div>
         </div>

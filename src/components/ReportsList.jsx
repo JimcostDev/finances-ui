@@ -49,9 +49,7 @@ export default function ReportsList() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-blue-50 p-6 rounded-xl max-w-md text-center">
-          <p className="text-blue-600 font-medium">
-            No se encontraron reportes
-          </p>
+          <p className="text-blue-600 font-medium">No se encontraron reportes</p>
         </div>
       </div>
     );
@@ -64,86 +62,91 @@ export default function ReportsList() {
           Todos mis reportes
         </Title>
 
-        <ul className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
+        {/* 
+          Ajustes en la cuadrícula:
+          - 1 columna en pantallas pequeñas
+          - 2 columnas a partir de 'md' (768px)
+          - 3 columnas a partir de 'lg' (1024px) si lo deseas
+        */}
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {reports.map((report) => (
             <li
               key={report.id}
-              className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative" // Añadido 'relative'
+              className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
             >
-              {/* Botón de edición - Nueva sección */}
-              <div className="absolute top-4 right-4">
+              {/* Botón de edición */}
+              <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
                 <a
                   href={`/edit-report/${report.id}`}
-                  className="px-4 py-2.5  bg-amber-50 text-yellow-700  rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
+                  className="px-4 py-2 text-sm sm:text-base bg-amber-50 text-yellow-700 rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
                 >
                   Editar
                 </a>
               </div>
 
-              {/* Sección del título existente */}
-              <div className="mb-6 pb-4 border-b border-gray-200">
-                <h3 className="text-xl font-bold text-gray-900">
-                  {report.month.charAt(0).toUpperCase() + report.month.slice(1)}{" "}
-                  {report.year}
+              {/* Cabecera del reporte */}
+              <div className="mb-4 sm:mb-6 pb-2 sm:pb-4 border-b border-gray-200">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
+                  {report.month.charAt(0).toUpperCase() + report.month.slice(1)} {report.year}
                 </h3>
               </div>
-              <div className="grid grid-cols-2 gap-6">
+
+              {/* 
+                Ajustes en la cuadrícula interna:
+                - 1 columna en pantallas muy pequeñas
+                - 2 columnas a partir de 'sm' (640px)
+              */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Columna Izquierda */}
                 <div className="space-y-4">
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-green-700">
-                      Ingreso Bruto
-                    </p>
-                    <p className="text-xl font-bold text-green-800">
-                      ${report.total_ingreso_bruto}
+                  <div className="bg-green-50 p-3 sm:p-4 rounded-lg">
+                    <p className="text-xs sm:text-sm font-medium text-green-700">Ingreso Bruto</p>
+                    <p className="text-base sm:text-xl font-bold text-green-800">
+                      ${report.total_ingreso_bruto.toFixed(2)}
                     </p>
                   </div>
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-blue-700">
-                      Ingresos Netos
-                    </p>
-                    <p className="text-xl font-bold text-blue-800">
-                      ${report.ingresos_netos}
+                  <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                    <p className="text-xs sm:text-sm font-medium text-blue-700">Ingresos Netos</p>
+                    <p className="text-base sm:text-xl font-bold text-blue-800">
+                      ${report.ingresos_netos.toFixed(2)}
                     </p>
                   </div>
                 </div>
 
                 {/* Columna Derecha */}
                 <div className="space-y-4">
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-red-700">
-                      Total Gastos
-                    </p>
-                    <p className="text-xl font-bold text-red-800">
-                      ${report.total_gastos}
+                  <div className="bg-red-50 p-3 sm:p-4 rounded-lg">
+                    <p className="text-xs sm:text-sm font-medium text-red-700">Total Gastos</p>
+                    <p className="text-base sm:text-xl font-bold text-red-800">
+                      ${report.total_gastos.toFixed(2)}
                     </p>
                   </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-purple-700">
-                      Liquidación Final
-                    </p>
-                    <p className="text-xl font-bold text-purple-800">
-                      ${report.liquidacion}
+                  <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
+                    <p className="text-xs sm:text-sm font-medium text-purple-700">Liquidación</p>
+                    <p className="text-base sm:text-xl font-bold text-purple-800">
+                      ${report.liquidacion.toFixed(2)}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Detalles Adicionales */}
-              <div className="mt-6 pt-4 border-t border-gray-200 grid grid-cols-3 gap-4">
+              {/* 
+                Detalles Adicionales
+                - 1 columna en pantallas pequeñas
+                - 3 columnas a partir de 'sm'
+              */}
+              <div className="mt-4 sm:mt-6 pt-2 sm:pt-4 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Diezmos</p>
-                  <p className="font-medium text-gray-900">${report.diezmos}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Diezmos</p>
+                  <p className="text-sm sm:text-base font-medium text-gray-900">${report.diezmos.toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Ofrendas</p>
-                  <p className="font-medium text-gray-900">
-                    ${report.ofrendas}
-                  </p>
+                  <p className="text-xs sm:text-sm text-gray-600">Ofrendas</p>
+                  <p className="text-sm sm:text-base font-medium text-gray-900">${report.ofrendas.toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Iglesia</p>
-                  <p className="font-medium text-gray-900">${report.iglesia}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Iglesia</p>
+                  <p className="text-sm sm:text-base font-medium text-gray-900">${report.iglesia.toFixed(2)}</p>
                 </div>
               </div>
             </li>
