@@ -101,8 +101,8 @@ export default function Dashboard() {
         className={`
           ${sidebarOpen ? "block" : "hidden"}
           md:block w-64 bg-white border-r border-gray-100 shadow-xl 
-          md:relative md:h-auto h-full p-6 flex flex-col fixed top-0 left-0 
-          z-50
+          md:relative md:h-auto h-full p-6 my-2 flex flex-col fixed top-0 left-0 
+          z-49
         `}
       >
         <div className="mb-8">
@@ -175,17 +175,7 @@ export default function Dashboard() {
       <div className="flex-1 p-8 md:ml-auto">
         {/* Título de sección */}
         <div className="mb-6">
-          {currentView === "reports" && (
-            <h1 className="text-2xl font-bold text-gray-800">Reportes Financieros</h1>
-          )}
-          {currentView === "create-report" && (
-            <h1 className="text-2xl font-bold text-gray-800">Crear Nuevo Reporte</h1>
-          )}
-          {currentView === "user" && (
-            <h1 className="text-2xl font-bold text-gray-800">Configuración de Perfil</h1>
-          )}
         </div>
-
         {renderContent()}
       </div>
     </div>

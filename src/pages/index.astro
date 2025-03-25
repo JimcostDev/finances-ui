@@ -6,7 +6,7 @@ const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token'
 ---
 
 <Layout title="Bienvenido a MyFinances">
-  <main class="min-h-screen bg-gray-50 py-12">
+  <main class="min-h-screen bg-gray-50 py-24">
     <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {hasToken ? (
         <!-- Contenido para usuarios autenticados -->
@@ -27,9 +27,6 @@ const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token'
         <!-- Contenido para usuarios no autenticados -->
         <div class="text-center space-y-8">
           <div class="space-y-4">
-            <h1 class="text-4xl font-bold text-gray-900">
-              MyFinances
-            </h1>
             <p class="text-xl text-gray-600">
               Gestión financiera personalizada y segura
             </p>

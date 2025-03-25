@@ -1,0 +1,13 @@
+---
+import '../../styles/global.css';
+import Layout from '../../layouts/Layout.astro';
+import SectionContainer from '../../components/SectionContainer.astro';
+import DeleteReportForm from '../../components/DeleteReportForm.jsx';
+
+const { id } = Astro.params;
+---
+<Layout title="Eliminar Reporte">
+  <SectionContainer id="delete-report">
+    <DeleteReportForm reportId={id} client:load />
+  </SectionContainer>
+</Layout>

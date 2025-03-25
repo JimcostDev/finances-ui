@@ -74,13 +74,19 @@ export default function ReportsList() {
               key={report.id}
               className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
             >
-              {/* Botón de edición */}
-              <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+              {/* Botones de edición y eliminación */}
+              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex gap-2">
                 <a
                   href={`/edit-report/${report.id}`}
-                  className="px-4 py-2 text-sm sm:text-base bg-amber-50 text-yellow-700 rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
+                  className="px-3 py-2 text-sm sm:text-base bg-amber-50 text-yellow-700 rounded-lg hover:bg-yellow-100 hover:text-yellow-800 transition-colors"
                 >
                   Editar
+                </a>
+                <a
+                  href={`/delete-report/${report.id}`}
+                  className="px-3 py-2 text-sm sm:text-base bg-red-50 text-red-700 rounded-lg hover:bg-red-100 hover:text-red-800 transition-colors"
+                >
+                  Eliminar
                 </a>
               </div>
 

@@ -63,7 +63,7 @@ export async function fetchReportsByMonth(month, year, token) {
     return await response.json();
   }
 
-// Función para obtner usuarios
+// Función para obtener usuarios
 export async function fetchUserProfile(token) {
   const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
     method: "GET",
@@ -132,3 +132,52 @@ export async function getReportById(reportId, token) {
   }
   return await response.json();
 }
+
+// Función para eliminar un reporte 
+export async function deleteReport(reportId, token) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al eliminar el reporte");
+  }
+  return await response.json();
+}
+
+// Actualizar perfil de usuario
+export const updateUserProfile = async (token, userData) => {
+  const response = await fetch(`${API_BASE_URL}/users/profile`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error ${response.status}: No se pudo actualizar el perfil`);
+  }
+
+  return response.json();
+};
+
+// Eliminar usuario
+export const deleteUserProfile = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/users/profile`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error ${response.status}: No se pudo eliminar el usuario`);
+  }
+};
