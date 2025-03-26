@@ -3,19 +3,48 @@ const { title } = Astro.props;
 import { ClientRouter } from 'astro:transitions';
 ---
 <!doctype html>
-<html lang="en">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="/logo-white.svg" />
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="MyFinances es la herramienta ideal para gestionar tus finanzas personales de manera fácil y eficiente." />
+    <meta name="keywords" content="finanzas personales, gestión financiera, presupuesto, ahorro, MyFinances, jimcostdev" />
+    <meta name="author" content="Ronaldo Jiménez Acosta" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="MyFinances - Gestión de Finanzas Personales" />
+    <meta property="og:description" content="Organiza tu dinero, ahorra y controla tus gastos con MyFinances." />
+    <meta property="og:image" content="/logo-black.svg" />
+    <meta property="og:url" content="https://myfinances.com" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MyFinances - Gestión de Finanzas Personales" />
+    <meta name="twitter:description" content="Organiza tu dinero, ahorra y controla tus gastos con MyFinances." />
+    <meta name="twitter:image" content="/logo-black.svg" />
+
+    <!-- Accesibilidad y UX -->
+    <meta name="theme-color" content="#4CAF50" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Astro Generator -->
     <meta name="generator" content={Astro.generator} />
+
     <title>{title}</title>
     <ClientRouter />
   </head>
   <body class="min-h-screen bg-gray-50">
     <header class="bg-white shadow-md p-4 fixed top-0 left-0 right-0 flex items-center justify-center z-50">
       <a href="/dashboard" class="flex items-center gap-2">
-        <img src="/astro.svg" alt="Logo" class="h-10 w-auto" />
+        <img src="/logo-black.svg" alt="MyFinances Logo" class="h-10 w-auto" />
         <span class="hidden sm:inline-block text-xl font-bold text-gray-800">MyFinances</span>
       </a>
     </header>
