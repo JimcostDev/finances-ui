@@ -1,0 +1,11 @@
+---
+import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import SectionContainer from '../components/SectionContainer.astro';
+import DeleteUserProfileForm from '../components/DeleteUserProfile.jsx';
+---
+<Layout title="Eliminar Cuenta - MyFinances">
+  <SectionContainer id="delete-user">
+    <DeleteUserProfileForm client:load />
+  </SectionContainer>
+</Layout>

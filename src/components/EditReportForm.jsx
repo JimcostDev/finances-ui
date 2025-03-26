@@ -83,7 +83,7 @@ export default function EditReportForm({ reportId }) {
 
       await updateReport(reportId, payload, token);
       setSuccess('Reporte actualizado exitosamente!');
-      setTimeout(() => window.location.href = '/reports', 2000);
+      setTimeout(() => window.location.href = '/dashboard', 2000);
     } catch (err) {
       setError(err.message);
     } finally {

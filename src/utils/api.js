@@ -151,7 +151,7 @@ export async function deleteReport(reportId, token) {
 
 // Actualizar perfil de usuario
 export const updateUserProfile = async (token, userData) => {
-  const response = await fetch(`${API_BASE_URL}/users/profile`, {
+  const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -169,7 +169,7 @@ export const updateUserProfile = async (token, userData) => {
 
 // Eliminar usuario
 export const deleteUserProfile = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/users/profile`, {
+  const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${token}`,

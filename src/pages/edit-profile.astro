@@ -1,0 +1,11 @@
+---
+import "../styles/global.css";
+import Layout from '../layouts/Layout.astro';
+import SectionContainer from '../components/SectionContainer.astro';
+import EditProfileForm from '../components/LoadDataUser.jsx';
+---
+<Layout title="Editar Perfil - MyFinances">
+    <SectionContainer id="edit-profile">
+        <EditProfileForm client:load>
+    </SectionContainer>
+</Layout>
