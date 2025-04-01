@@ -181,3 +181,18 @@ export const deleteUserProfile = async (token) => {
     throw new Error(`Error ${response.status}: No se pudo eliminar el usuario`);
   }
 };
+
+// Función para obtener reporte anual
+export async function fetchAnnualReport(year, token) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/annual?year=${year}`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al obtener el reporte anual");
+  }
+  return await response.json();
+}

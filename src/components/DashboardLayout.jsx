@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchUserProfile } from "../utils/api";
 import ReportsByMonth from "./ReportsByMonth";
+import AnnualReport from "./AnnualReport"; 
 import ViewSelector from "./ViewSelector";
 import UserProfile from "./UserProfile";
 import LogoutIcon from "./icons/Logout";
@@ -45,6 +46,8 @@ export default function Dashboard() {
     switch (currentView) {
       case "reports":
         return <ViewSelector />;
+      case "annual":
+          return <AnnualReport />;
       case "create-report":
         return <CreateReportForm />;
       case "user":
@@ -141,6 +144,19 @@ export default function Dashboard() {
               </button>
             </div>
           )}
+
+<SidebarButton
+            view="annual"
+            currentView={currentView}
+            onClick={(val) => {
+              setCurrentView(val);
+              setSidebarOpen(false);
+            }}
+            icon="📅"
+            className="hover:bg-gray-50"
+          >
+            Reporte Anual
+          </SidebarButton>
 
           <SidebarButton
             view="user"
