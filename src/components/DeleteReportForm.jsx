@@ -7,7 +7,6 @@ export default function DeleteReportForm({ reportId }) {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    // Verificar que se haya escrito "eliminar" (sin mayúsculas o espacios adicionales)
     if (confirmation.trim().toLowerCase() !== 'eliminar') {
       setError("Debes escribir 'eliminar' para confirmar.");
       return;
@@ -18,11 +17,9 @@ export default function DeleteReportForm({ reportId }) {
 
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error("No se encontró token de autenticación");
-      }
+      if (!token) throw new Error("No se encontró token de autenticación");
+
       await deleteReport(reportId, token);
-      // Redirigir a la página de reportes tras la eliminación
       window.location.href = '/reports';
     } catch (err) {
       setError(err.message);
@@ -40,6 +37,7 @@ export default function DeleteReportForm({ reportId }) {
       <p className="mb-4 text-gray-700">
         Para confirmar, escribe <span className="font-bold">eliminar</span> en el siguiente campo:
       </p>
+      
       <input 
         type="text"
         value={confirmation}
@@ -47,14 +45,26 @@ export default function DeleteReportForm({ reportId }) {
         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
         placeholder="Escribe 'eliminar' para confirmar"
       />
+
       {error && <p className="mt-2 text-red-600">{error}</p>}
-      <button 
-        onClick={handleDelete}
-        disabled={loading}
-        className="w-full mt-4 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-      >
-        {loading ? "Eliminando..." : "Eliminar Reporte"}
-      </button>
+
+      <div className="flex gap-4 mt-6">
+        <button 
+          onClick={handleDelete}
+          disabled={loading}
+          className="flex-1 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+        >
+          {loading ? "Eliminando..." : "Eliminar Reporte"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="flex-1 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+        >
+          Cancelar
+        </button>
+      </div>
     </div>
   );
 }

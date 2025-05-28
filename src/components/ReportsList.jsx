@@ -166,8 +166,8 @@ export default function ReportsList() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Iglesia</p>
-                  <p className="text-sm sm:text-base font-medium text-gray-900">
+                  <p className="text-xs sm:text-sm text-cyan-700">Iglesia</p>
+                  <p className="text-sm sm:text-base font-medium text-cyan-900">
                     ${report.iglesia.toFixed(2)}
                   </p>
                 </div>
