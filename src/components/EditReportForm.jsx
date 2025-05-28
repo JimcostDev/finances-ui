@@ -286,7 +286,7 @@ export default function EditReportForm({ reportId }) {
             disabled={loading}
             className="flex-1 py-3.5 px-6 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
           >
-            {loading ? "Actualizando..." : "Guardar Cambios"}
+            {loading ? "Actualizando..." : "Guardar"}
           </button>
         </div>
       </form>
