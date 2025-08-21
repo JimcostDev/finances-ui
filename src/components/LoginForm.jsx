@@ -69,14 +69,22 @@ export default function LoginForm() {
               />
             </div>
           </div>
+          <div className="flex flex-col items-center">
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              Acceder
+            </button>
 
-          <button
-            type="submit"
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            Acceder
-          </button>
-
+            <button
+              type="button"
+              onClick={() => window.history.back()} // Esto hace que vuelva a la página anterior
+              className="mt-2 text-sm text-blue-500 hover:text-blue-700 transition-colors duration-200"
+            >
+              Cancelar
+            </button>
+          </div>
           {message && (
             <p className={`mt-4 text-center text-sm ${message === "Inicio de sesión exitoso" ? "text-green-600" : "text-red-600"}`}>
               {message}

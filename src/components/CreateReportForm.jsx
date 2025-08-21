@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { createReport } from "../utils/api";
+import { href } from "react-router-dom";
 
 export default function CreateReportForm() {
   const [formData, setFormData] = useState({
@@ -256,11 +257,22 @@ export default function CreateReportForm() {
           </div>
         )}
 
-        {/* Botón de envío */}
+        
+        {/* Botón de envío y cancelar */}
+        <div className="flex justify-between items-center space-x-4">
+          <button
+            type="button"
+            onClick={() => window.location.href = "/dashboard"}
+            className="flex-1 py-3.5 px-6 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+          > 
+            Cancelar
+          </button>
+
+          {/* Botón de envío */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 px-6 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+          className="flex-1 py-3.5 px-6 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -287,9 +299,10 @@ export default function CreateReportForm() {
               Procesando...
             </span>
           ) : (
-            "Crear Reporte"
+            "Crear"
           )}
         </button>
+        </div>
       </form>
     </div>
   );

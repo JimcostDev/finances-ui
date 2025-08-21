@@ -61,11 +61,11 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
+    <div className="m-2 p-2">
+      <div className="max-w-2xl md:mx-auto">
         <div className="bg-white rounded-xl shadow-md border border-gray-100">
           {/* Encabezado con botón para editar */}
-          <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center">
+          <div className="p-4 md:p-6 border-b border-gray-200 flex justify-between items-center">
             
             <div className="flex gap-3">
               <a

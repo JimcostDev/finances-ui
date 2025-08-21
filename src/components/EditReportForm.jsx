@@ -103,8 +103,8 @@ export default function EditReportForm({ reportId }) {
   if (!formData) return <div className="text-red-500 p-4">Error: {error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-      <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+    <div className="max-w-3xl md:mx-auto mx-8 py-8 px-4 sm:px-6 lg:px-8 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="md:text-3xl text-2xl font-bold text-gray-900 mb-8 text-center">
         Editar Reporte - {formData.month} {formData.year}
       </h2>
 

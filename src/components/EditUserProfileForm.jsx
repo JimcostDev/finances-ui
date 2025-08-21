@@ -135,15 +135,23 @@ export default function EditUserProfileForm({ initialData }) {
               placeholder="••••••••"
             />
           </div>
+          <div className="flex justify-between items-center space-x-4">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="flex-1 py-3.5 px-6 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancelar
+            </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-          >
-            {loading ? "Guardando..." : "Guardar Cambios"}
-          </button>
-
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-3.5 px-6 bg-green-600 hover:bg-green-700 text-white font-medium  rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              {loading ? "Guardando..." : "Guardar"}
+            </button>
+          </div>
           {message.text && (
             <div
               className={`mt-4 p-4 rounded-lg text-sm ${

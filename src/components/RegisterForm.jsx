@@ -124,14 +124,22 @@ export default function RegisterForm() {
               required
             />
           </div>
+          <div className="flex flex-col items-center">
+            <button 
+              type="submit" 
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              Registrar cuenta
+            </button>
 
-          <button 
-            type="submit" 
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-          >
-            Registrar cuenta
-          </button>
-          
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="mt-2 text-sm text-blue-500 hover:text-blue-700 transition-colors duration-200"
+            >
+              Cancelar
+            </button>
+          </div>
           {message.text && (
             <div className={`mt-4 p-4 rounded-lg text-sm ${
               message.type === "error" 

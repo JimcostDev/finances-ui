@@ -29,7 +29,7 @@ export default function DeleteReportForm({ reportId }) {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md border border-gray-200">
+    <div className="max-w-md md:mx-auto mx-8 bg-white p-6 rounded-xl shadow-md border border-gray-200">
       <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Eliminar Reporte</h2>
       <p className="mb-4 text-gray-700">
         ¿Estás seguro de que deseas eliminar este reporte? Esta acción no se puede deshacer.
@@ -54,7 +54,7 @@ export default function DeleteReportForm({ reportId }) {
           disabled={loading}
           className="flex-1 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
         >
-          {loading ? "Eliminando..." : "Eliminar Reporte"}
+          {loading ? "Eliminando..." : "Eliminar"}
         </button>
 
         <button
