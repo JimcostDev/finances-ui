@@ -1,7 +1,7 @@
 {
   "name": "Finances",
   "short_name": "Finances",
-  "description": "Gestor financiero",
+  "description": "Gestor financiero de JimcostDev",
   "lang": "es-ES",
   "start_url": "/",
   "scope": "/",
