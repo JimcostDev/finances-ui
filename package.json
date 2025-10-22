@@ -9,13 +9,13 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^4.3.0",
-    "@astrojs/vercel": "^8.2.6",
+    "@astrojs/react": "^4.4.0",
+    "@astrojs/vercel": "^8.2.11",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.0.14",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "astro": "^5.13.2",
+    "astro": "^5.14.8",
     "jwt-decode": "^4.0.0",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",

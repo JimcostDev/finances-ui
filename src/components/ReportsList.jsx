@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchReports } from "../utils/api";
+import { fetchReports } from "@utils/api";
 import Title from "./Title";
 
 export default function ReportsList() {
