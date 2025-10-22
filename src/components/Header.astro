@@ -1,0 +1,82 @@
+---
+// src/components/Header.astro
+const currentPath = Astro.url.pathname;
+
+// Determinar si el usuario está autenticado (esto lo puedes ajustar según tu lógica de auth)
+const isAuthenticated = false; // Aquí deberías verificar si hay sesión activa
+
+// Rutas donde NO mostrar botones de login/registro (porque ya estamos en esas páginas)
+const hideAuthButtons = ['/login', '/register'].includes(currentPath);
+
+// Rutas protegidas donde mostrar el botón de "Volver"
+const showBackButton = ['/dashboard', '/reports', '/monthly'].some(route => currentPath.startsWith(route));
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo y nombre -->
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+          <span class="text-white text-xl font-bold">$</span>
+        </div>
+        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent hidden sm:block">
+          MyFinances
+        </span>
+      </a>
+
+      <!-- Navegación -->
+      <div class="flex items-center gap-3">
+        {showBackButton && (
+          <a
+            href="/dashboard"
+            class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-gray-100"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span class="hidden sm:inline">Volver</span>
+          </a>
+        )}
+
+        {!hideAuthButtons && !isAuthenticated && (
+          <>
+            <a
+              href="/login"
+              class="px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-lg hover:bg-gray-100"
+            >
+              Iniciar Sesión
+            </a>
+            <a
+              href="/register"
+              class="px-5 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white font-medium rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+            >
+              Crear Cuenta
+            </a>
+          </>
+        )}
+
+        {isAuthenticated && (
+          <button
+            id="logout-btn"
+            class="px-4 py-2 text-red-600 hover:bg-red-50 font-medium transition-colors rounded-lg"
+          >
+            Cerrar Sesión
+          </button>
+        )}
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // Script para manejar el logout si es necesario
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      // Aquí iría tu lógica de logout
+      localStorage.removeItem('token'); // ejemplo
+      window.location.href = '/';
+    });
+  }
+</script>

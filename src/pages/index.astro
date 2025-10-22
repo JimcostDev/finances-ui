@@ -1,58 +1,113 @@
 ---
-import '@styles/global.css';
 import Layout from "@layouts/Layout.astro";
 ---
 
-<Layout title="Bienvenido a MyFinances">
-  <main class="min-h-screen bg-gray-50 py-24">
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<Layout title="MyFinances - Gestión Financiera Personal">
+  <main class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <!-- Hero Section -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
       <div class="text-center space-y-8">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+          <span>✨</span>
+          <span>Tu asistente financiero personal</span>
+        </div>
+
+        <!-- Título Principal -->
         <div class="space-y-4">
-          <p class="text-xl text-gray-600">
-            Gestión financiera personalizada
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 bg-clip-text text-transparent leading-tight">
+            Controla tus Finanzas
+          </h1>
+          <p class="text-xl sm:text-2xl text-gray-600 max-w-2xl mx-auto">
+            Registra gastos e ingresos, calcula diezmos y ofrendas automáticamente, y visualiza reportes mensuales y anuales
           </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-          <!-- Opción Iniciar Sesión -->
-          <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
-            <div class="mb-6">
-              <span class="text-6xl">📊</span>
-            </div>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-              ¿Ya tienes cuenta?
-            </h2>
-            <p class="text-gray-500 mb-6">
-              Gestiona tus reportes financieros con tu cuenta registrada
-            </p>
-            <a
-              href="/login"
-              class="inline-block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Iniciar Sesión
-            </a>
-          </div>
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <a
+            href="/register"
+            class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white text-lg font-semibold rounded-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+          >
+            Empezar Gratis
+          </a>
+          <a
+            href="/login"
+            class="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 text-lg font-semibold rounded-xl border-2 border-gray-200 hover:border-blue-600 hover:text-blue-600 transition-all duration-300"
+          >
+            Iniciar Sesión
+          </a>
+        </div>
+      </div>
+    </section>
 
-          <!-- Opción Crear Cuenta -->
-          <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
-            <div class="mb-6">
-              <span class="text-6xl">✨</span>
-            </div>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-              ¿Nuevo por aquí?
-            </h2>
-            <p class="text-gray-500 mb-6">
-              Empieza a controlar tus finanzas en menos de 2 minutos
-            </p>
-            <a
-              href="/register"
-              class="inline-block w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
-            >
-              Crear Cuenta
-            </a>
+    <!-- Features Section -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+            <span class="text-3xl">💰</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">
+            Registra Fácilmente
+          </h3>
+          <p class="text-gray-600">
+            Añade tus gastos e ingresos en segundos. Interfaz simple e intuitiva diseñada para uso diario.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+            <span class="text-3xl">📊</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">
+            Reportes Detallados
+          </h3>
+          <p class="text-gray-600">
+            Visualiza reportes mensuales y anuales con gráficos claros. Toma decisiones informadas sobre tu dinero.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+            <span class="text-3xl">⛪</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">
+            Cálculo Automático
+          </h3>
+          <p class="text-gray-600">
+            Calcula diezmos y ofrendas automáticamente basándose en tus ingresos. Nunca olvides tus compromisos.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="bg-gradient-to-r from-blue-600 to-green-600 rounded-3xl p-12 text-white shadow-2xl">
+        <div class="grid md:grid-cols-3 gap-8 text-center">
+          <div class="space-y-2">
+            <div class="text-4xl font-bold">100%</div>
+            <div class="text-blue-100">Gratis</div>
+          </div>
+          <div class="space-y-2">
+            <div class="text-4xl font-bold"> 2 min </div>
+            <div class="text-blue-100">Para empezar</div>
+          </div>
+          <div class="space-y-2">
+            <div class="text-4xl font-bold">24/7</div>
+            <div class="text-blue-100">Disponible</div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center text-gray-500">
+      <p>© 2025 MyFinances by jimcostdev. Hecho con ❤️ para tu bienestar financiero.</p>
+    </footer>
   </main>
 </Layout>
