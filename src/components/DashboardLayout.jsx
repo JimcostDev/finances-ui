@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import { fetchUserProfile } from "@utils/api";
 import ReportsByMonth from "./ReportsByMonth";
 import AnnualReport from "./AnnualReport"; 
@@ -56,7 +56,7 @@ export default function Dashboard() {
     window.location.href = "/";
   };
 
-  // Loading state
+  // Estados de carga / error
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -68,7 +68,6 @@ export default function Dashboard() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -97,10 +96,10 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex relative">
       {/* Sidebar Desktop */}
       <aside className="hidden lg:flex w-72 bg-white border-r border-gray-200 flex-col">
-        {/* Header del sidebar */}
+        {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center">
@@ -114,7 +113,7 @@ export default function Dashboard() {
         </div>
 
         {/* Navegación */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => (
             <div key={item.id}>
               <button
@@ -129,7 +128,7 @@ export default function Dashboard() {
                 <span className="font-medium">{item.label}</span>
               </button>
 
-              {/* Submenú para Reportes */}
+              {/* Submenú */}
               {item.hasSubmenu && currentView === "reports" && (
                 <div className="ml-10 mt-2 space-y-1">
                   <button
@@ -147,8 +146,8 @@ export default function Dashboard() {
           ))}
         </nav>
 
-        {/* Footer del sidebar */}
-        <div className="p-4 border-t border-gray-200">
+        {/* Footer fijo */}
+        <div className="p-4 border-t border-gray-200 sticky bottom-0 bg-white">
           <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200 mb-3">
             <p className="font-semibold text-gray-900 truncate">{userData?.fullname}</p>
             <p className="text-sm text-gray-600 truncate">{userData?.email}</p>
@@ -166,61 +165,51 @@ export default function Dashboard() {
       </aside>
 
       {/* Header Mobile */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white text-lg font-bold">$</span>
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">MyFinances</h2>
+      <header className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
+            <span className="text-white text-lg font-bold">$</span>
           </div>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <h2 className="text-lg font-bold text-gray-900">MyFinances</h2>
         </div>
-      </div>
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </header>
 
-      {/* Sidebar Mobile (Drawer) */}
+      {/* Sidebar Mobile */}
       {sidebarOpen && (
         <>
-          {/* Overlay */}
           <div
-            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setSidebarOpen(false)}
           />
-
-          {/* Drawer */}
-          <aside className="lg:hidden fixed top-0 right-0 bottom-0 w-80 bg-white z-50 flex flex-col shadow-2xl">
+          <aside className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 flex flex-col shadow-2xl animate-slideIn">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center">
-                    <span className="text-white text-xl font-bold">$</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">MyFinances</h2>
-                    <p className="text-sm text-gray-600">@{userData?.username}</p>
-                  </div>
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">$</span>
                 </div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <h2 className="text-lg font-bold text-gray-900">@{userData?.username}</h2>
               </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
             {/* Navegación */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            <nav className="flex-1 p-4 overflow-y-auto space-y-2">
               {navItems.map((item) => (
                 <div key={item.id}>
                   <button
@@ -238,7 +227,6 @@ export default function Dashboard() {
                     <span className="font-medium">{item.label}</span>
                   </button>
 
-                  {/* Submenú */}
                   {item.hasSubmenu && currentView === "reports" && (
                     <div className="ml-10 mt-2 space-y-1">
                       <button
@@ -259,8 +247,8 @@ export default function Dashboard() {
               ))}
             </nav>
 
-            {/* Footer */}
-            <div className="p-4 border-t border-gray-200">
+            {/* Footer fijo en móvil */}
+            <div className="p-4 border-t border-gray-200 bg-white sticky bottom-0">
               <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200 mb-3">
                 <p className="font-semibold text-gray-900 truncate">{userData?.fullname}</p>
                 <p className="text-sm text-gray-600 truncate">{userData?.email}</p>
@@ -280,9 +268,7 @@ export default function Dashboard() {
       )}
 
       {/* Contenido Principal */}
-      <main className="flex-1 lg:pt-0 pt-16">
-        {renderContent()}
-      </main>
+      <main className="flex-1 lg:pt-0 pt-16">{renderContent()}</main>
     </div>
   );
 }

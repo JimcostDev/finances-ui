@@ -188,7 +188,11 @@ export default function ReportsList() {
                   <div className="bg-red-50 rounded-xl p-3 border border-red-100">
                     <div className="flex items-center gap-2 mb-2">
                       <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-10.293l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 10.586V7a1 1 0 112 0v3.586l1.293-1.293a1 1 0 011.414 1.414z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L11 9.586V6a1 1 0 10-2 0v3.586L7.707 7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <p className="text-xs font-semibold text-red-700">Gastos</p>
                     </div>
