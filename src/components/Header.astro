@@ -1,15 +1,22 @@
 ---
-// src/components/Header.astro
 const currentPath = Astro.url.pathname;
 
 // Determinar si el usuario está autenticado (esto lo puedes ajustar según tu lógica de auth)
 const isAuthenticated = false; // Aquí deberías verificar si hay sesión activa
 
+// Rutas donde NO mostrar el header (Dashboard tiene su propio header)
+const hideHeader = currentPath.startsWith('/dashboard');
+
 // Rutas donde NO mostrar botones de login/registro (porque ya estamos en esas páginas)
 const hideAuthButtons = ['/login', '/register'].includes(currentPath);
 
 // Rutas protegidas donde mostrar el botón de "Volver"
-const showBackButton = ['/dashboard', '/reports', '/monthly'].some(route => currentPath.startsWith(route));
+const showBackButton = ['/reports', '/monthly'].some(route => currentPath.startsWith(route));
+
+// Si está en dashboard, no renderizar nada
+if (hideHeader) {
+  return null;
+}
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">

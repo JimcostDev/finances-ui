@@ -18,7 +18,8 @@ export default function ReportsList() {
 
     fetchReports(token)
       .then((data) => {
-        setReports(data);
+        // Asegurarse de que data sea un array
+        setReports(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {
@@ -27,10 +28,12 @@ export default function ReportsList() {
       });
   }, []);
 
-  // Obtener años únicos para el filtro
-  const uniqueYears = [...new Set(reports.map(r => r.year))].sort((a, b) => b - a);
+  // Obtener años únicos para el filtro - con validación
+  const uniqueYears = Array.isArray(reports) && reports.length > 0
+    ? [...new Set(reports.map(r => r.year))].sort((a, b) => b - a)
+    : [];
 
-  // Filtrar reportes
+  // Filtrar reportes - con validación
   const filteredReports = filter === "all" 
     ? reports 
     : reports.filter(r => r.year === parseInt(filter));
@@ -71,7 +74,7 @@ export default function ReportsList() {
   }
 
   // Empty state
-  if (!reports || reports.length === 0) {
+  if (!Array.isArray(reports) || reports.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
@@ -83,10 +86,10 @@ export default function ReportsList() {
           <h3 className="text-lg font-bold text-gray-900 mb-2">No hay reportes aún</h3>
           <p className="text-gray-600 mb-6">Comienza a agregar tus ingresos y gastos para generar reportes</p>
           <a 
-            href="/dashboard"
+            href="/create-report"
             className="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
           >
-            Ir al Dashboard
+            Ir a Crear Reporte
           </a>
         </div>
       </div>
