@@ -137,8 +137,8 @@ export default function CreateReportForm() {
                     porcentaje_ofrenda: e.target.value,
                   }))
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="% Ofr"
+                className="w-30 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="% Ofrenda"
                 title="Porcentaje de Ofrenda"
                 required
               />
