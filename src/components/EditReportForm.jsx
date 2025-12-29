@@ -85,13 +85,14 @@ export default function EditReportForm({ reportId }) {
 
       const payload = {
         ...formData,
+        year: parseInt(formData.year, 10),
         ingresos: formData.ingresos.map((i) => ({
           ...i,
-          monto: parseFloat(i.monto),
+          monto: Math.abs(parseFloat(i.monto)) || 0,
         })),
         gastos: formData.gastos.map((g) => ({
           ...g,
-          monto: parseFloat(g.monto),
+          monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
         porcentaje_ofrenda: parseFloat(formData.porcentaje_ofrenda) / 100,
       };
