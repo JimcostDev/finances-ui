@@ -56,13 +56,14 @@ export default function CreateReportForm() {
 
       const payload = {
         ...formData,
+        year: parseInt(formData.year, 10),
         ingresos: formData.ingresos.map((i) => ({
           concepto: i.concepto,
-          monto: parseFloat(i.monto),
+          monto: Math.abs(parseFloat(i.monto)) || 0,
         })),
         gastos: formData.gastos.map((g) => ({
           concepto: g.concepto,
-          monto: parseFloat(g.monto),
+          monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
         porcentaje_ofrenda: parseFloat(formData.porcentaje_ofrenda) / 100,
       };
