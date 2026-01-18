@@ -1,0 +1,12 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import SectionContainer from "../components/SectionContainer.astro";
+import GeneralBalance from "../components/GeneralBalance.jsx";
+---
+
+<Layout title="Balance General - MyFinances">
+  <SectionContainer id="general-balance">
+    <GeneralBalance client:load />
+  </SectionContainer>
+</Layout>

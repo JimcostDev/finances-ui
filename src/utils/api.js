@@ -196,3 +196,21 @@ export async function fetchAnnualReport(year, token) {
   }
   return await response.json();
 }
+
+// Función para obtener el balance general (histórico)
+export async function fetchGeneralBalance(token) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/general-balance`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    // Intentamos parsear el error del backend, o ponemos uno genérico
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Error al obtener el balance general");
+  }
+
+  return await response.json();
+}

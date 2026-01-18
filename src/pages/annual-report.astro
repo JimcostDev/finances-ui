@@ -2,10 +2,10 @@
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import SectionContainer from "../components/SectionContainer.astro";
-import AnnualReportList from "../components/AnnualReport.jsx";
+import AnnualReport from "../components/AnnualReport.jsx";
 ---
 <Layout title="Reporte Anual - MyFinances">
   <SectionContainer id="annual-report">
-    <AnnualReportList client:load />
+    <AnnualReport client:load />
   </SectionContainer>
 </Layout>

@@ -1,15 +1,14 @@
 ---
-import "../styles/global.css";
 import Layout from '../layouts/Layout.astro';
 import SectionContainer from '../components/SectionContainer.astro';
 import ErrorBoundary from "../components/ErrorBoundary.jsx";
-import DashboardLayout from "../components/DashboardLayout.jsx";
+import Dashboard from "../components/Dashboard.jsx"; 
 ---
+
 <Layout title="Dashboard - MyFinances">
     <SectionContainer>
-        <ErrorBoundary>
-            <DashboardLayout client:load>
-            </DashboardLayout>
+        <ErrorBoundary client:load>
+            <Dashboard client:load />
         </ErrorBoundary>
     </SectionContainer>
 </Layout>
