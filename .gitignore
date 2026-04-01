@@ -22,4 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
-\n.vercel/
+
+# Vercel CLI (vercel link): proyecto enlazado en local, no versionar
+.vercel/
