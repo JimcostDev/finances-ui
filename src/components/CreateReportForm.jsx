@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { createReport } from "@utils/api";
+import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function CreateReportForm() {
+  const churchEnabled = useChurchContributions();
   const [formData, setFormData] = useState({
     month: "",
     year: new Date().getFullYear(),
@@ -54,6 +56,10 @@ export default function CreateReportForm() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No autenticado");
 
+      const ofrendaPct = churchEnabled
+        ? (parseFloat(formData.porcentaje_ofrenda) || 0) / 100
+        : 0;
+
       const payload = {
         ...formData,
         year: parseInt(formData.year, 10),
@@ -65,7 +71,7 @@ export default function CreateReportForm() {
           concepto: g.concepto,
           monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
-        porcentaje_ofrenda: parseFloat(formData.porcentaje_ofrenda) / 100,
+        porcentaje_ofrenda: ofrendaPct,
       };
 
       await createReport(payload, token);
@@ -128,21 +134,25 @@ export default function CreateReportForm() {
                 required
               />
 
-              <input
-                type="number"
-                step="1"
-                value={formData.porcentaje_ofrenda}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    porcentaje_ofrenda: e.target.value,
-                  }))
-                }
-                className="w-30 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="% Ofrenda"
-                title="Porcentaje de Ofrenda"
-                required
-              />
+              {churchEnabled && (
+                <input
+                  type="number"
+                  step="1"
+                  min="1"
+                  max="99"
+                  value={formData.porcentaje_ofrenda}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      porcentaje_ofrenda: e.target.value,
+                    }))
+                  }
+                  className="w-30 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="% Ofrenda"
+                  title="Porcentaje de Ofrenda"
+                  required
+                />
+              )}
             </div>
           </div>
         </div>

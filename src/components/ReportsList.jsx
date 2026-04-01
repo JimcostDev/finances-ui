@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { fetchReports } from "@utils/api";
+import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function ReportsList() {
+  const churchEnabled = useChurchContributions();
   const [reports, setReports] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -205,35 +207,36 @@ export default function ReportsList() {
                   </div>
                 </div>
 
-                {/* Compromisos religiosos */}
-                <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                    </svg>
-                    <p className="text-sm font-semibold text-purple-700">Compromisos</p>
+                {churchEnabled && (
+                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                      </svg>
+                      <p className="text-sm font-semibold text-purple-700">Compromisos</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-xs text-purple-600">Diezmos</p>
+                        <p className="text-sm font-bold text-purple-900">
+                          ${report.diezmos.toFixed(2)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-purple-600">Ofrendas</p>
+                        <p className="text-sm font-bold text-purple-900">
+                          ${report.ofrendas.toFixed(2)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-purple-600">Total</p>
+                        <p className="text-sm font-bold text-purple-900">
+                          ${report.iglesia.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <p className="text-xs text-purple-600">Diezmos</p>
-                      <p className="text-sm font-bold text-purple-900">
-                        ${report.diezmos.toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-purple-600">Ofrendas</p>
-                      <p className="text-sm font-bold text-purple-900">
-                        ${report.ofrendas.toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-purple-600">Total</p>
-                      <p className="text-sm font-bold text-purple-900">
-                        ${report.iglesia.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                )}
 
                 {/* Botones de acción */}
                 <div className="flex gap-2 pt-2">

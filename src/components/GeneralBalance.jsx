@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { fetchGeneralBalance } from "../utils/api";
+import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function GeneralBalance() {
+  const churchEnabled = useChurchContributions();
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -83,11 +85,11 @@ export default function GeneralBalance() {
     doc.setFontSize(12);
     doc.setTextColor(22, 101, 52);
     doc.text(`${parseFloat(report.total_ingreso_bruto).toFixed(2)}`, margin + 3, yPos + 13);
-    // Neto pequeño
-    doc.setFontSize(8);
-    doc.setTextColor(22, 163, 74);
-    doc.text(`Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}`, margin + 3, yPos + 18);
-
+    if (churchEnabled) {
+      doc.setFontSize(8);
+      doc.setTextColor(22, 163, 74);
+      doc.text(`Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}`, margin + 3, yPos + 18);
+    }
 
     // Gastos
     const xPosRight = margin + (pageWidth - 2 * margin - 5) / 2 + 5;
@@ -184,24 +186,25 @@ export default function GeneralBalance() {
                 </div>
               </div>
 
-              {/* Compromisos Totales  */}
-              <div className="bg-purple-50 rounded-xl p-4 border border-purple-100 mt-4">
-                <p className="text-xs font-medium text-purple-700 mb-3">Aportes a Iglesia (Total)</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <p className="text-xs text-purple-600">Diezmos</p>
-                    <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_diezmos).toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-purple-600">Ofrendas</p>
-                    <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_ofrendas).toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-purple-600">Total</p>
-                    <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_iglesia).toFixed(2)}</p>
+              {churchEnabled && (
+                <div className="bg-purple-50 rounded-xl p-4 border border-purple-100 mt-4">
+                  <p className="text-xs font-medium text-purple-700 mb-3">Aportes a Iglesia (Total)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <p className="text-xs text-purple-600">Diezmos</p>
+                      <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_diezmos).toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-purple-600">Ofrendas</p>
+                      <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_ofrendas).toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-purple-600">Total</p>
+                      <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_iglesia).toFixed(2)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Footer Actions */}

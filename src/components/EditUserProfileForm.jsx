@@ -9,6 +9,9 @@ export default function EditUserProfileForm({ initialData }) {
     password: "",
     confirm_password: "",
   });
+  const [enableChurchContributions, setEnableChurchContributions] = useState(
+    Boolean(initialData.enable_church_contributions)
+  );
   const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -62,6 +65,8 @@ export default function EditUserProfileForm({ initialData }) {
         payload.password = form.password;
         payload.confirm_password = form.confirm_password;
       }
+
+      payload.enable_church_contributions = enableChurchContributions;
 
       await updateUserProfile(token, payload);
       setMessage({ text: "¡Perfil actualizado exitosamente!", type: "success" });
@@ -184,6 +189,42 @@ export default function EditUserProfileForm({ initialData }) {
                     disabled={loading}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Preferencias financieras */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Preferencias
+              </h3>
+              <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    Habilitar cálculo de diezmos y ofrendas
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Si está desactivado, el ingreso neto será igual al bruto y no se mostrarán compromisos en los reportes.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={enableChurchContributions}
+                  onClick={() => setEnableChurchContributions((v) => !v)}
+                  disabled={loading}
+                  className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    enableChurchContributions ? "bg-green-600" : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition ${
+                      enableChurchContributions ? "translate-x-5" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
               </div>
             </div>
 

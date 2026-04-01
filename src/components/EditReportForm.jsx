@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getReportById, updateReport } from "../utils/api";
+import { getReportById, updateReport, fetchUserProfile } from "../utils/api";
 
 export default function EditReportForm({ reportId }) {
   const [formData, setFormData] = useState(null);
+  const [churchEnabled, setChurchEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [collapsedSections, setCollapsedSections] = useState({
@@ -24,7 +26,12 @@ export default function EditReportForm({ reportId }) {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No autenticado");
 
-        const report = await getReportById(reportId, token);
+        const [profile, report] = await Promise.all([
+          fetchUserProfile(token),
+          getReportById(reportId, token),
+        ]);
+
+        setChurchEnabled(Boolean(profile.enable_church_contributions));
         setFormData({
           ...report,
           porcentaje_ofrenda: report.porcentaje_ofrenda * 100,
@@ -75,13 +82,17 @@ export default function EditReportForm({ reportId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
     setError("");
     setSuccess("");
 
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No autenticado");
+
+      const ofrendaPct = churchEnabled
+        ? (parseFloat(formData.porcentaje_ofrenda) || 0) / 100
+        : 0;
 
       const payload = {
         ...formData,
@@ -94,7 +105,7 @@ export default function EditReportForm({ reportId }) {
           ...g,
           monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
-        porcentaje_ofrenda: parseFloat(formData.porcentaje_ofrenda) / 100,
+        porcentaje_ofrenda: ofrendaPct,
       };
 
       await updateReport(reportId, payload, token);
@@ -103,7 +114,7 @@ export default function EditReportForm({ reportId }) {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -182,21 +193,25 @@ export default function EditReportForm({ reportId }) {
                 required
               />
 
-              <input
-                type="number"
-                step="1"
-                value={formData.porcentaje_ofrenda}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    porcentaje_ofrenda: e.target.value,
-                  }))
-                }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="% Ofr"
-                title="Porcentaje de Ofrenda"
-                required
-              />
+              {churchEnabled && (
+                <input
+                  type="number"
+                  step="1"
+                  min="1"
+                  max="99"
+                  value={formData.porcentaje_ofrenda}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      porcentaje_ofrenda: e.target.value,
+                    }))
+                  }
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="% Ofr"
+                  title="Porcentaje de Ofrenda"
+                  required
+                />
+              )}
             </div>
           </div>
         </div>
@@ -422,10 +437,10 @@ export default function EditReportForm({ reportId }) {
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={saving}
                 className="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
+                {saving ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

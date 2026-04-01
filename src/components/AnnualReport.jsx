@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { fetchAnnualReport } from "@utils/api";
+import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function AnnualReport() {
+  const churchEnabled = useChurchContributions();
   const [selectedYear, setSelectedYear] = useState("");
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
@@ -128,13 +130,15 @@ export default function AnnualReport() {
       margin + 3,
       yPos + 13
     );
-    doc.setFontSize(8);
-    doc.setTextColor(22, 163, 74);
-    doc.text(
-      `Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}`,
-      margin + 3,
-      yPos + 18
-    );
+    if (churchEnabled) {
+      doc.setFontSize(8);
+      doc.setTextColor(22, 163, 74);
+      doc.text(
+        `Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}`,
+        margin + 3,
+        yPos + 18
+      );
+    }
 
     // Gastos
     const xPosRight = margin + (pageWidth - 2 * margin - 5) / 2 + 5;
@@ -162,43 +166,44 @@ export default function AnnualReport() {
 
     yPos += 30;
 
-    // Compromisos Religiosos
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("Compromisos Anuales", margin, yPos);
-    yPos += 10;
+    if (churchEnabled) {
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont(undefined, "bold");
+      doc.text("Compromisos Anuales", margin, yPos);
+      yPos += 10;
 
-    doc.setFillColor(250, 245, 255); // Morado claro
-    doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 25, 2, 2, "F");
+      doc.setFillColor(250, 245, 255); // Morado claro
+      doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 25, 2, 2, "F");
 
-    const colWidth = (pageWidth - 2 * margin) / 3;
-    doc.setFontSize(8);
-    doc.setTextColor(124, 58, 237);
-    doc.text("Diezmos", margin + 5, yPos + 7);
-    doc.text("Ofrendas", margin + colWidth + 5, yPos + 7);
-    doc.text("Total", margin + 2 * colWidth + 5, yPos + 7);
+      const colWidth = (pageWidth - 2 * margin) / 3;
+      doc.setFontSize(8);
+      doc.setTextColor(124, 58, 237);
+      doc.text("Diezmos", margin + 5, yPos + 7);
+      doc.text("Ofrendas", margin + colWidth + 5, yPos + 7);
+      doc.text("Total", margin + 2 * colWidth + 5, yPos + 7);
 
-    doc.setFontSize(11);
-    doc.setTextColor(88, 28, 135);
-    doc.setFont(undefined, "bold");
-    doc.text(
-      `${parseFloat(report.total_diezmos).toFixed(2)}`,
-      margin + 5,
-      yPos + 15
-    );
-    doc.text(
-      `${parseFloat(report.total_ofrendas).toFixed(2)}`,
-      margin + colWidth + 5,
-      yPos + 15
-    );
-    doc.text(
-      `${parseFloat(report.total_iglesia).toFixed(2)}`,
-      margin + 2 * colWidth + 5,
-      yPos + 15
-    );
+      doc.setFontSize(11);
+      doc.setTextColor(88, 28, 135);
+      doc.setFont(undefined, "bold");
+      doc.text(
+        `${parseFloat(report.total_diezmos).toFixed(2)}`,
+        margin + 5,
+        yPos + 15
+      );
+      doc.text(
+        `${parseFloat(report.total_ofrendas).toFixed(2)}`,
+        margin + colWidth + 5,
+        yPos + 15
+      );
+      doc.text(
+        `${parseFloat(report.total_iglesia).toFixed(2)}`,
+        margin + 2 * colWidth + 5,
+        yPos + 15
+      );
 
-    yPos += 35;
+      yPos += 35;
+    }
 
     // Promedios Mensuales
     doc.setFontSize(12);
@@ -421,9 +426,11 @@ export default function AnnualReport() {
                     <p className="text-2xl font-bold text-green-800">
                       ${parseFloat(report.total_ingreso_bruto).toFixed(2)}
                     </p>
-                    <p className="text-xs text-green-600 mt-1">
-                      Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}
-                    </p>
+                    {churchEnabled && (
+                      <p className="text-xs text-green-600 mt-1">
+                        Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Gastos */}
@@ -437,32 +444,33 @@ export default function AnnualReport() {
                   </div>
                 </div>
 
-                {/* Compromisos religiosos */}
-                <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
-                  <p className="text-xs font-medium text-purple-700 mb-3">
-                    Compromisos Anuales
-                  </p>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <p className="text-xs text-purple-600">Diezmos</p>
-                      <p className="text-lg font-bold text-purple-900">
-                        ${parseFloat(report.total_diezmos).toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-purple-600">Ofrendas</p>
-                      <p className="text-lg font-bold text-purple-900">
-                        ${parseFloat(report.total_ofrendas).toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-purple-600">Total</p>
-                      <p className="text-lg font-bold text-purple-900">
-                        ${parseFloat(report.total_iglesia).toFixed(2)}
-                      </p>
+                {churchEnabled && (
+                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
+                    <p className="text-xs font-medium text-purple-700 mb-3">
+                      Compromisos Anuales
+                    </p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <p className="text-xs text-purple-600">Diezmos</p>
+                        <p className="text-lg font-bold text-purple-900">
+                          ${parseFloat(report.total_diezmos).toFixed(2)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-purple-600">Ofrendas</p>
+                        <p className="text-lg font-bold text-purple-900">
+                          ${parseFloat(report.total_ofrendas).toFixed(2)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-purple-600">Total</p>
+                        <p className="text-lg font-bold text-purple-900">
+                          ${parseFloat(report.total_iglesia).toFixed(2)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Estadísticas adicionales */}
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">

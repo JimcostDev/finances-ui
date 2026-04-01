@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { fetchUserProfile } from '@utils/api';
 
 const ProfileItem = ({ icon, label, value }) => (
@@ -164,6 +164,11 @@ export default function UserProfile() {
                 day: 'numeric',
                 timeZone: 'UTC'
               })}
+            />
+            <ProfileItem
+              icon="⛪"
+              label="Diezmos y ofrendas en reportes"
+              value={userData.enable_church_contributions ? 'Activado' : 'Desactivado'}
             />
           </div>
         </div>        

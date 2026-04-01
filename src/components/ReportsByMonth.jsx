@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchReportsByMonth } from "../utils/api";
+import { useChurchContributions } from "./ChurchContributionsContext";
 
 const monthOptions = [
   "enero",
@@ -17,6 +18,7 @@ const monthOptions = [
 ];
 
 export default function ReportsByMonth() {
+  const churchEnabled = useChurchContributions();
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [reports, setReports] = useState([]);
@@ -242,30 +244,31 @@ export default function ReportsByMonth() {
                       </div>
                     </div>
 
-                    {/* Compromisos religiosos - Compacto */}
-                    <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
-                      <p className="text-xs font-medium text-purple-700 mb-2">Compromisos</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <p className="text-xs text-purple-600">Diezmos</p>
-                          <p className="text-sm font-bold text-purple-900">
-                            ${report.diezmos.toFixed(2)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-purple-600">Ofrendas</p>
-                          <p className="text-sm font-bold text-purple-900">
-                            ${report.ofrendas.toFixed(2)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-purple-600">Total</p>
-                          <p className="text-sm font-bold text-purple-900">
-                            ${report.iglesia.toFixed(2)}
-                          </p>
+                    {churchEnabled && (
+                      <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
+                        <p className="text-xs font-medium text-purple-700 mb-2">Compromisos</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <p className="text-xs text-purple-600">Diezmos</p>
+                            <p className="text-sm font-bold text-purple-900">
+                              ${report.diezmos.toFixed(2)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-purple-600">Ofrendas</p>
+                            <p className="text-sm font-bold text-purple-900">
+                              ${report.ofrendas.toFixed(2)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-purple-600">Total</p>
+                            <p className="text-sm font-bold text-purple-900">
+                              ${report.iglesia.toFixed(2)}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Botones de acción - Compacto */}
                     <div className="flex gap-2">

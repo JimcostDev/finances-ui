@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchUserProfile } from "../utils/api";
 
+import { ChurchContributionsProvider } from "./ChurchContributionsContext";
 import DashboardLayout from "./DashboardLayout";
 import ReportsByMonth from "./ReportsByMonth";
 import AnnualReport from "./AnnualReport";
@@ -59,13 +60,15 @@ export default function Dashboard() {
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
 
   return (
-    <DashboardLayout
-      userData={userData}
-      currentView={currentView}
-      setCurrentView={setCurrentView} 
-      handleLogout={handleLogout}
-    >
-      {renderContent()}
-    </DashboardLayout>
+    <ChurchContributionsProvider enabled={userData?.enable_church_contributions}>
+      <DashboardLayout
+        userData={userData}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
+        handleLogout={handleLogout}
+      >
+        {renderContent()}
+      </DashboardLayout>
+    </ChurchContributionsProvider>
   );
 }
