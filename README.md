@@ -1,48 +1,66 @@
-# Astro Starter Kit: Basics
+# finances-ui (MyFinances)
 
-```sh
-npm create astro@latest -- --template basics
+Frontend web para gestionar finanzas personales: reportes mensuales y anuales, balance general, categorías de ingresos y gastos, perfil de usuario y autenticación por sesión (cookies HttpOnly).
+
+## Stack
+
+| Tecnología | Uso |
+|------------|-----|
+| [Astro](https://astro.build/) 6 | Páginas `.astro`, modo `server` (SSR) |
+| [React](https://react.dev/) 19 | Formularios y vistas interactivas (islas) |
+| [Tailwind CSS](https://tailwindcss.com/) 4 | Estilos (`@tailwindcss/vite`) |
+| TypeScript 5 | Tipado estricto (`astro/tsconfigs/strict`) |
+| [@astrojs/vercel](https://docs.astro.build/en/guides/integrations-guide/vercel/) | Despliegue en Vercel |
+
+Las peticiones al backend usan `fetch` con `credentials: "include"` para enviar la cookie de sesión.
+
+## Requisitos
+
+- Node.js compatible con Astro 6 (recomendado: LTS actual)
+- Backend API disponible (ver configuración de URL abajo)
+
+## Instalación y comandos
+
+Desde la carpeta `finances-ui`:
+
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # salida en ./dist/
+npm run preview  # vista previa del build
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## Configuración del API
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+La URL base del backend está en `src/config/apiUrl.ts` (`API_BASE_URL`). Para desarrollo local, apunta al servidor que expongas (por ejemplo el puerto de tu API) y ajusta según tu entorno.
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Estructura principal
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+src/
+├── components/     # React: auth, dashboard, reports, user, layout, icons
+├── config/         # p. ej. apiUrl
+├── interfaces/     # Tipos compartidos (IUser, IReport, …)
+├── layouts/        # Layouts Astro
+├── pages/          # Rutas (login, register, dashboard, reportes, …)
+├── services/       # Llamadas HTTP a /api (auth, reportes, usuario)
+└── utils/          # Utilidades (p. ej. manejo de errores)
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Alias TypeScript (ver `tsconfig.json`): `@components/*`, `@layouts/*`, `@services`, `@interfaces`, `@utils/*`, `@styles/*`.
 
-## 🧞 Commands
+## Rutas de páginas (resumen)
 
-All commands are run from the root of the project, from a terminal:
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Inicio |
+| `/login`, `/register` | Autenticación |
+| `/dashboard` | Panel con navegación a reportes, crear reporte, anual, balance, perfil |
+| `/reports`, `/create-report`, `/annual-report`, `/general-balance` | Vistas de reportes |
+| `/edit-report/[id]`, `/delete-report/[id]` | Edición y borrado |
+| `/edit-profile`, `/delete-user` | Perfil y baja de cuenta |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Desarrollo
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Los componentes React viven bajo `src/components/` y se importan en las páginas `.astro` con `client:load` u otras directivas según necesidad.
+- Para comprobar tipos: `npx astro check` (si está disponible en tu entorno) o el análisis del IDE con la configuración del proyecto.
