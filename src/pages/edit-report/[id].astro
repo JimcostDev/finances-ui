@@ -1,10 +1,12 @@
 ---
-import '../../styles/global.css';
 import Layout from '../../layouts/Layout.astro';
-import EditReportForm from '../../components/EditReportForm.jsx';
-import SectionContainer from '../../components/SectionContainer.astro';
-const { id } = Astro.params;
-//console.log('ID de reporte - page:', id);
+import EditReportForm from "@components/reports/EditReportForm.tsx";
+import SectionContainer from "@components/layout/SectionContainer.astro";
+
+const id = Astro.params.id;
+if (!id) {
+  return Astro.redirect("/reports");
+}
 ---
 
 <Layout title="Editar Reporte">

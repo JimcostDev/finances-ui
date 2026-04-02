@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import type { IUser } from "@interfaces";
 import { fetchUserProfile } from "@services";
-import EditUserProfileForm from './EditUserProfileForm';
+import { getErrorMessage } from "@utils/error";
+import EditUserProfileForm from "./EditUserProfileForm";
 
 export default function EditUserProfilePage() {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const data = await fetchUserProfile();
         setUserData(data);
-      } catch (err) {
-        setError(err.message);
-        window.location.href = '/login';
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "No se pudo cargar el perfil"));
+        window.location.href = "/login";
       } finally {
         setLoading(false);
       }
@@ -25,7 +27,7 @@ export default function EditUserProfilePage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600 font-medium">Cargando datos del usuario...</p>
@@ -37,7 +39,7 @@ export default function EditUserProfilePage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-red-200">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,6 +65,10 @@ export default function EditUserProfilePage() {
         </div>
       </div>
     );
+  }
+
+  if (!userData) {
+    return null;
   }
 
   return <EditUserProfileForm initialData={userData} />;

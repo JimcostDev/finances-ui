@@ -1,42 +1,56 @@
-import React from 'react';
+import React from "react";
+import type { ErrorInfo, ReactNode } from "react";
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+interface Props {
+  children: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+function toError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error));
+}
+
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = { 
-      hasError: false, 
+    this.state = {
+      hasError: false,
       error: null,
-      errorInfo: null 
+      errorInfo: null,
     };
   }
 
-  static getDerivedStateFromError(error) {
-    // Actualiza el estado para que el siguiente renderizado muestre la UI alternativa.
-    return { hasError: true, error };
+  static getDerivedStateFromError(error: unknown): Partial<State> {
+    return { hasError: true, error: toError(error) };
   }
 
-  componentDidCatch(error, errorInfo) {
-    // Aquí podrías enviar el error a un servicio de logging.
-    console.error("ErrorBoundary capturó un error:", error, errorInfo);
+  componentDidCatch(error: unknown, errorInfo: ErrorInfo): void {
+    const err = toError(error);
+    console.error("ErrorBoundary capturó un error:", err, errorInfo);
     this.setState({ errorInfo });
   }
 
-  handleReload = () => {
+  handleReload = (): void => {
     window.location.reload();
-  }
+  };
 
-  handleGoHome = () => {
-    window.location.href = '/';
-  }
+  handleGoHome = (): void => {
+    window.location.href = "/";
+  };
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full">
             <div className="bg-white rounded-2xl shadow-xl border border-red-200 overflow-hidden">
               {/* Header con icono de error */}
-              <div className="bg-gradient-to-r from-red-600 to-orange-600 p-8 text-center">
+              <div className="bg-linear-to-r from-red-600 to-orange-600 p-8 text-center">
                 <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
                   <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -54,7 +68,7 @@ class ErrorBoundary extends React.Component {
               <div className="p-8 space-y-6">
                 {/* Mensaje principal */}
                 <div className="flex items-start gap-4 p-4 bg-red-50 rounded-xl border border-red-200">
-                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
                     <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -68,7 +82,7 @@ class ErrorBoundary extends React.Component {
                 </div>
 
                 {/* Detalles técnicos (colapsables) */}
-                {this.state.errorInfo && process.env.NODE_ENV === 'development' && (
+                {this.state.errorInfo && import.meta.env.DEV && (
                   <details className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                     <summary className="cursor-pointer font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +109,7 @@ class ErrorBoundary extends React.Component {
                 {/* Sugerencias */}
                 <div className="grid gap-3">
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     <div>
@@ -105,7 +119,7 @@ class ErrorBoundary extends React.Component {
                   </div>
 
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
-                    <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                     <div>
@@ -115,7 +129,7 @@ class ErrorBoundary extends React.Component {
                   </div>
 
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
-                    <svg className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <div>
@@ -128,8 +142,9 @@ class ErrorBoundary extends React.Component {
                 {/* Botones de acción */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button
+                    type="button"
                     onClick={this.handleReload}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -138,6 +153,7 @@ class ErrorBoundary extends React.Component {
                   </button>
 
                   <button
+                    type="button"
                     onClick={this.handleGoHome}
                     className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-semibold border border-gray-300"
                   >
@@ -151,7 +167,7 @@ class ErrorBoundary extends React.Component {
                 {/* Nota de soporte */}
                 <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                   <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div>

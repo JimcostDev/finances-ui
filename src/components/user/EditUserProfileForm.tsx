@@ -1,7 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, type ChangeEventHandler, type SubmitEventHandler } from "react";
+import type { IUser, IUpdateUserPayload } from "@interfaces";
 import { updateUserProfile } from "@services";
+import { getErrorMessage } from "@utils/error";
+import {
+  computePasswordStrength,
+  passwordStrengthBarClass,
+  passwordStrengthLabel,
+} from "@utils/passwordStrength";
+import FormStickyActions from "@components/layout/FormStickyActions.tsx";
+import Title from "@components/layout/Title.tsx";
 
-export default function EditUserProfileForm({ initialData }) {
+interface EditUserProfileFormProps {
+  initialData: IUser;
+}
+
+export default function EditUserProfileForm({ initialData }: EditUserProfileFormProps) {
   const [form, setForm] = useState({
     fullname: initialData.fullname || "",
     email: initialData.email || "",
@@ -18,25 +31,19 @@ export default function EditUserProfileForm({ initialData }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleChange = (e) => {
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const { name, value } = e.target;
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
 
-    // Calcular fortaleza de contraseña
-    if (e.target.name === "password") {
-      const pass = e.target.value;
-      let strength = 0;
-      if (pass.length >= 8) strength++;
-      if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) strength++;
-      if (/[0-9]/.test(pass)) strength++;
-      if (/[^a-zA-Z0-9]/.test(pass)) strength++;
-      setPasswordStrength(strength);
+    if (name === "password") {
+      setPasswordStrength(computePasswordStrength(value));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setMessage({ text: "", type: "" });
 
@@ -53,8 +60,9 @@ export default function EditUserProfileForm({ initialData }) {
 
     setLoading(true);
     try {
-      // Crear payload solo con los campos que tienen datos
-      const payload = {};
+      const payload: IUpdateUserPayload = {
+        enable_church_contributions: enableChurchContributions,
+      };
       if (form.fullname) payload.fullname = form.fullname;
       if (form.email) payload.email = form.email;
       if (form.username) payload.username = form.username;
@@ -63,35 +71,17 @@ export default function EditUserProfileForm({ initialData }) {
         payload.confirm_password = form.confirm_password;
       }
 
-      payload.enable_church_contributions = enableChurchContributions;
-
       await updateUserProfile(payload);
       setMessage({ text: "¡Perfil actualizado exitosamente!", type: "success" });
 
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1500);
-    } catch (err) {
-      setMessage({ text: err.message || "Error al actualizar el perfil", type: "error" });
+    } catch (err: unknown) {
+      setMessage({ text: getErrorMessage(err, "Error al actualizar el perfil"), type: "error" });
     } finally {
       setLoading(false);
     }
-  };
-
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength === 0) return "bg-gray-200";
-    if (passwordStrength === 1) return "bg-red-500";
-    if (passwordStrength === 2) return "bg-yellow-500";
-    if (passwordStrength === 3) return "bg-blue-500";
-    return "bg-green-500";
-  };
-
-  const getPasswordStrengthText = () => {
-    if (passwordStrength === 0) return "";
-    if (passwordStrength === 1) return "Débil";
-    if (passwordStrength === 2) return "Regular";
-    if (passwordStrength === 3) return "Buena";
-    return "Excelente";
   };
 
   return (
@@ -99,9 +89,9 @@ export default function EditUserProfileForm({ initialData }) {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 space-y-2">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          <Title as="h2" size="md">
             Editar Perfil
-          </h2>
+          </Title>
           <p className="text-gray-600">
             Actualiza tu información personal
           </p>
@@ -109,7 +99,7 @@ export default function EditUserProfileForm({ initialData }) {
 
         {/* Card principal */}
         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 pb-36 lg:pb-8">
             {/* Información Personal */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -293,14 +283,14 @@ export default function EditUserProfileForm({ initialData }) {
                         <div
                           key={level}
                           className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                            level <= passwordStrength ? getPasswordStrengthColor() : "bg-gray-200"
+                            level <= passwordStrength ? passwordStrengthBarClass(passwordStrength) : "bg-gray-200"
                           }`}
                         />
                       ))}
                     </div>
                     {passwordStrength > 0 && (
                       <p className="text-xs text-gray-600">
-                        Contraseña: <span className="font-semibold">{getPasswordStrengthText()}</span>
+                        Contraseña: <span className="font-semibold">{passwordStrengthLabel(passwordStrength)}</span>
                       </p>
                     )}
                   </div>
@@ -356,11 +346,11 @@ export default function EditUserProfileForm({ initialData }) {
                   : "bg-green-50 text-green-700 border-green-200"
               }`}>
                 {message.type === "error" ? (
-                  <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 )}
@@ -368,34 +358,18 @@ export default function EditUserProfileForm({ initialData }) {
               </div>
             )}
 
-            {/* Botones */}
-            <div className="flex gap-3 pt-4">
-              <button
-                type="button"
-                onClick={() => window.history.back()}
-                className="flex-1 py-3 px-6 bg-gray-200 text-gray-800 font-semibold rounded-xl hover:bg-gray-300 transition-colors"
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </span>
-                ) : (
-                  "Guardar Cambios"
-                )}
-              </button>
-            </div>
+            <FormStickyActions
+              cancelLabel="Cancelar"
+              submitLabel="Guardar"
+              loadingLabel="Guardando…"
+              loading={loading}
+              onCancel={() => {
+                window.location.href = "/dashboard";
+              }}
+              cancelDisabled={loading}
+              primaryDisabled={loading}
+              maxWidthClass="max-w-2xl mx-auto w-full"
+            />
           </form>
         </div>
       </div>
