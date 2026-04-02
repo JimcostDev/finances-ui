@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { deleteUserProfile } from "../utils/api";
+import { deleteUserProfile, logoutUser } from "../utils/api";
 
 export default function DeleteUserProfileForm() {
   const [confirmation, setConfirmation] = useState("");
@@ -16,11 +16,12 @@ export default function DeleteUserProfileForm() {
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No se encontró token de autenticación");
-      await deleteUserProfile(token);
-      // Al eliminar el usuario, eliminar el token y redirigir al home o login
-      localStorage.removeItem("token");
+      await deleteUserProfile();
+      try {
+        await logoutUser();
+      } catch {
+        /* cookie puede quedar inválida igualmente */
+      }
       window.location.href = "/";
     } catch (err) {
       setError(err.message);

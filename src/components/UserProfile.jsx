@@ -21,23 +21,13 @@ export default function UserProfile() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      window.location.href = '/login';
-      return;
-    }
-
     const loadUserData = async () => {
       try {
-        const data = await fetchUserProfile(token);
+        const data = await fetchUserProfile();
         setUserData(data);
       } catch (err) {
         setError(err.message);
-        if (err.message.includes("401")) {
-          localStorage.removeItem('token');
-          window.location.href = '/login';
-        }
+        window.location.href = '/login';
       } finally {
         setLoading(false);
       }

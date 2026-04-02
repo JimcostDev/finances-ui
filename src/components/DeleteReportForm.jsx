@@ -16,10 +16,7 @@ export default function DeleteReportForm({ reportId }) {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error("No se encontró token de autenticación");
-
-      await deleteReport(reportId, token);
+      await deleteReport(reportId);
       window.location.href = '/reports';
     } catch (err) {
       setError(err.message);

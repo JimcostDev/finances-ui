@@ -1,15 +1,23 @@
-const API_BASE_URL = "https://finances.koyeb.app";
-//const API_BASE_URL = "http://localhost:3000";
+import { API_BASE_URL } from "../config/apiUrl.js";
 
-// Función para registrar un usuario
+const jsonHeaders = {
+  "Content-Type": "application/json",
+};
+
+/** Opciones base para que el navegador envíe la cookie HttpOnly en peticiones cross-origin */
+function cred(init = {}) {
+  return {
+    credentials: "include",
+    ...init,
+    headers: { ...jsonHeaders, ...(init.headers || {}) },
+  };
+}
+
 export async function registerUser(userData) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register`, cred({
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(userData)
-  });
+    body: JSON.stringify(userData),
+  }));
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al registrar el usuario");
@@ -17,15 +25,11 @@ export async function registerUser(userData) {
   return await response.json();
 }
 
-// Función para iniciar sesión
 export async function loginUser(credentials) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, cred({
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(credentials)
-  });
+    body: JSON.stringify(credentials),
+  }));
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al iniciar sesión");
@@ -33,48 +37,47 @@ export async function loginUser(credentials) {
   return await response.json();
 }
 
-// Función para obtener los reportes
-export async function fetchReports(token) {
-    const response = await fetch(`${API_BASE_URL}/api/reports`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error al obtener reportes");
-    }
-    return await response.json();
-  }
+/** Cierra sesión en el servidor (borra cookie HttpOnly) */
+export async function logoutUser() {
+  await fetch(`${API_BASE_URL}/api/auth/logout`, cred({ method: "POST" }));
+}
 
-// Función para obtener los reportes por mes
-export async function fetchReportsByMonth(month, year, token) {
-    const response = await fetch(`${API_BASE_URL}/api/reports/by-month?month=${month}&year=${year}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error al obtener reportes por mes");
-    }
-    return await response.json();
+/** Comprueba sesión válida y devuelve el usuario (misma forma que el perfil) */
+export async function fetchAuthMe() {
+  const response = await fetch(`${API_BASE_URL}/api/auth/me`, cred({ method: "GET" }));
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Error ${response.status}`);
   }
+  return await response.json();
+}
 
-// Función para obtener usuarios
-export async function fetchUserProfile(token) {
-  const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",  
-      "Authorization": `Bearer ${token}`
-    }
-  });
+export async function fetchReports() {
+  const response = await fetch(`${API_BASE_URL}/api/reports`, cred({ method: "GET" }));
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al obtener reportes");
+  }
+  return await response.json();
+}
+
+export async function fetchReportsByMonth(month, year) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/reports/by-month?month=${encodeURIComponent(month)}&year=${year}`,
+    cred({ method: "GET" })
+  );
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al obtener reportes por mes");
+  }
+  return await response.json();
+}
+
+export async function fetchUserProfile() {
+  const response = await fetch(`${API_BASE_URL}/api/users/profile`, cred({ method: "GET" }));
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));  // Captura errores JSON
+    const errorData = await response.json().catch(() => ({}));
     console.error("Error en fetchUserProfile:", errorData);
     throw new Error(errorData.error || `Error ${response.status}: No se pudo obtener el perfil`);
   }
@@ -82,17 +85,12 @@ export async function fetchUserProfile(token) {
   return await response.json();
 }
 
-// Función para crear un reporte
-export async function createReport(reportData, token) {
-  const response = await fetch(`${API_BASE_URL}/api/reports`, {
+export async function createReport(reportData) {
+  const response = await fetch(`${API_BASE_URL}/api/reports`, cred({
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(reportData)
-  });
-  
+    body: JSON.stringify(reportData),
+  }));
+
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al crear el reporte");
@@ -100,17 +98,12 @@ export async function createReport(reportData, token) {
   return await response.json();
 }
 
-// Función para actualizar un reporte
-export async function updateReport(reportId, reportData, token) {
-  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, {
+export async function updateReport(reportId, reportData) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, cred({
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(reportData)
-  });
-  
+    body: JSON.stringify(reportData),
+  }));
+
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al actualizar el reporte");
@@ -118,14 +111,9 @@ export async function updateReport(reportId, reportData, token) {
   return await response.json();
 }
 
-// Función para obtener un reporte por ID
-export async function getReportById(reportId, token) {
-  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, {
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
-  
+export async function getReportById(reportId) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, cred({ method: "GET" }));
+
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al obtener el reporte");
@@ -133,15 +121,10 @@ export async function getReportById(reportId, token) {
   return await response.json();
 }
 
-// Función para eliminar un reporte 
-export async function deleteReport(reportId, token) {
-  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, {
+export async function deleteReport(reportId) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, cred({
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
+  }));
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al eliminar el reporte");
@@ -149,16 +132,11 @@ export async function deleteReport(reportId, token) {
   return await response.json();
 }
 
-// Actualizar perfil de usuario
-export const updateUserProfile = async (token, userData) => {
-  const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
+export const updateUserProfile = async (userData) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/profile`, cred({
+    method: "PUT",
     body: JSON.stringify(userData),
-  });
+  }));
 
   if (!response.ok) {
     throw new Error(`Error ${response.status}: No se pudo actualizar el perfil`);
@@ -167,29 +145,20 @@ export const updateUserProfile = async (token, userData) => {
   return response.json();
 };
 
-// Eliminar usuario
-export const deleteUserProfile = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
+export const deleteUserProfile = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/users/profile`, cred({
+    method: "DELETE",
+  }));
 
   if (!response.ok) {
     throw new Error(`Error ${response.status}: No se pudo eliminar el usuario`);
   }
 };
 
-// Función para obtener reporte anual
-export async function fetchAnnualReport(year, token) {
-  const response = await fetch(`${API_BASE_URL}/api/reports/annual?year=${year}`, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
+export async function fetchAnnualReport(year) {
+  const response = await fetch(`${API_BASE_URL}/api/reports/annual?year=${year}`, cred({
+    method: "GET",
+  }));
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al obtener el reporte anual");
@@ -197,17 +166,12 @@ export async function fetchAnnualReport(year, token) {
   return await response.json();
 }
 
-// Función para obtener el balance general (histórico)
-export async function fetchGeneralBalance(token) {
-  const response = await fetch(`${API_BASE_URL}/api/reports/general-balance`, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
+export async function fetchGeneralBalance() {
+  const response = await fetch(`${API_BASE_URL}/api/reports/general-balance`, cred({
+    method: "GET",
+  }));
 
   if (!response.ok) {
-    // Intentamos parsear el error del backend, o ponemos uno genérico
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || "Error al obtener el balance general");
   }
@@ -215,14 +179,8 @@ export async function fetchGeneralBalance(token) {
   return await response.json();
 }
 
-// Función para obtener categorías
-export async function fetchCategories(token) {
-  const response = await fetch(`${API_BASE_URL}/api/categories`, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
+export async function fetchCategories() {
+  const response = await fetch(`${API_BASE_URL}/api/categories`, cred({ method: "GET" }));
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || "Error al obtener categorías");

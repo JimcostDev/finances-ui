@@ -53,9 +53,6 @@ export default function EditUserProfileForm({ initialData }) {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No autenticado");
-
       // Crear payload solo con los campos que tienen datos
       const payload = {};
       if (form.fullname) payload.fullname = form.fullname;
@@ -68,7 +65,7 @@ export default function EditUserProfileForm({ initialData }) {
 
       payload.enable_church_contributions = enableChurchContributions;
 
-      await updateUserProfile(token, payload);
+      await updateUserProfile(payload);
       setMessage({ text: "¡Perfil actualizado exitosamente!", type: "success" });
 
       setTimeout(() => {

@@ -1,19 +1,17 @@
 ---
+import { API_BASE_URL } from "../config/apiUrl.js";
+
 const currentPath = Astro.url.pathname;
+const apiUrl = API_BASE_URL;
 
-// Determinar si el usuario está autenticado (esto lo puedes ajustar según tu lógica de auth)
-const isAuthenticated = false; // Aquí deberías verificar si hay sesión activa
+const isAuthenticated = false; 
 
-// Rutas donde NO mostrar el header (Dashboard tiene su propio header)
 const hideHeader = currentPath.startsWith('/dashboard');
 
-// Rutas donde NO mostrar botones de login/registro (porque ya estamos en esas páginas)
 const hideAuthButtons = ['/login', '/register'].includes(currentPath);
 
-// Rutas protegidas donde mostrar el botón de "Volver"
 const showBackButton = ['/reports', '/monthly'].some(route => currentPath.startsWith(route));
 
-// Si está en dashboard, no renderizar nada
 if (hideHeader) {
   return null;
 }
@@ -76,14 +74,15 @@ if (hideHeader) {
   </nav>
 </header>
 
-<script>
-  // Script para manejar el logout si es necesario
-  const logoutBtn = document.getElementById('logout-btn');
+<script define:vars={{ apiUrl }}>
+  const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      // Aquí iría tu lógica de logout
-      localStorage.removeItem('token'); // ejemplo
-      window.location.href = '/';
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await fetch(`${apiUrl}/api/auth/logout`, { method: "POST", credentials: "include" });
+      } finally {
+        window.location.href = "/";
+      }
     });
   }
 </script>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { fetchAnnualReport } from "@utils/api";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
@@ -8,24 +8,11 @@ export default function AnnualReport() {
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setToken(localStorage.getItem("token"));
-    }
-  }, []);
-
   const handleFetch = async (year) => {
-    if (!token) {
-      setError("No hay token disponible");
-      window.location.href = "/";
-      return;
-    }
     setLoading(true);
     setError("");
     try {
-      const data = await fetchAnnualReport(Number(year), token);
+      const data = await fetchAnnualReport(Number(year));
       setReport(data);
     } catch (err) {
       setError(err.message || "Error al obtener el reporte anual");

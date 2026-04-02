@@ -10,15 +10,7 @@ export default function ReportsList() {
   const [filter, setFilter] = useState("all"); // all, year
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("No se encontró token de autenticación.");
-      setLoading(false);
-      window.location.href = "/";
-      return;
-    }
-
-    fetchReports(token)
+    fetchReports()
       .then((data) => {
         // Asegurarse de que data sea un array
         setReports(Array.isArray(data) ? data : []);

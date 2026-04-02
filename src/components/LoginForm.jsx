@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { loginUser } from "@utils/api";
+import React, { useState, useEffect } from "react";
+import { fetchAuthMe, loginUser } from "@utils/api";
 
 export default function LoginForm() {
   const [credentials, setCredentials] = useState({
@@ -9,6 +9,22 @@ export default function LoginForm() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  /** false hasta comprobar si la cookie ya tiene sesión válida */
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchAuthMe()
+      .then(() => {
+        if (!cancelled) window.location.href = "/dashboard";
+      })
+      .catch(() => {
+        if (!cancelled) setSessionChecked(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleChange = (e) => {
     setCredentials({
@@ -23,10 +39,10 @@ export default function LoginForm() {
     setIsLoading(true);
     
     try {
-      const data = await loginUser(credentials);
+      await loginUser(credentials);
       setMessage("¡Bienvenido de vuelta!");
-      localStorage.setItem("token", data.token);
-      
+      // Sesión en cookie HttpOnly (no localStorage)
+
       // Pequeño delay para mostrar el mensaje de éxito
       setTimeout(() => {
         window.location.href = "/dashboard";
@@ -36,6 +52,17 @@ export default function LoginForm() {
       setIsLoading(false);
     }
   };
+
+  if (!sessionChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-gray-600 text-sm">Comprobando sesión…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 py-12 px-4 sm:px-6 lg:px-8">

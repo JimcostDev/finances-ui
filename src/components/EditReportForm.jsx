@@ -24,13 +24,10 @@ export default function EditReportForm({ reportId }) {
           throw new Error(`ID inválido: ${reportId}`);
         }
 
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No autenticado");
-
         const [profile, report, cats] = await Promise.all([
-          fetchUserProfile(token),
-          getReportById(reportId, token),
-          fetchCategories(token),
+          fetchUserProfile(),
+          getReportById(reportId),
+          fetchCategories(),
         ]);
 
         setChurchEnabled(Boolean(profile.enable_church_contributions));
@@ -121,9 +118,6 @@ export default function EditReportForm({ reportId }) {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No autenticado");
-
       const ofrendaPct = churchEnabled
         ? (parseFloat(formData.porcentaje_ofrenda) || 0) / 100
         : 0;
@@ -146,7 +140,7 @@ export default function EditReportForm({ reportId }) {
         porcentaje_ofrenda: ofrendaPct,
       };
 
-      await updateReport(reportId, payload, token);
+      await updateReport(reportId, payload);
       setSuccess("¡Reporte actualizado exitosamente!");
       setTimeout(() => (window.location.href = "/dashboard"), 1500);
     } catch (err) {

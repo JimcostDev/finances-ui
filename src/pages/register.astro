@@ -1,11 +1,14 @@
 ---
 import "../styles/global.css";
-import RegisterForm from '../components/RegisterForm.jsx';
-import Layout from '../layouts/Layout.astro';
-import SectionContainer from '../components/SectionContainer.astro';
+import RegisterForm from "../components/RegisterForm.jsx";
+import SessionRedirect from "../components/SessionRedirect.jsx";
+import Layout from "../layouts/Layout.astro";
+import SectionContainer from "../components/SectionContainer.astro";
 ---
+
 <Layout title="Registro - MyFinances">
-    <SectionContainer id="register">
-        <RegisterForm client:load>
-    </SectionContainer>
+  <SessionRedirect client:load />
+  <SectionContainer id="register">
+    <RegisterForm client:load />
+  </SectionContainer>
 </Layout>

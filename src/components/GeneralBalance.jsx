@@ -10,14 +10,8 @@ export default function GeneralBalance() {
 
   useEffect(() => {
     const loadBalance = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/login";
-        return;
-      }
-
       try {
-        const data = await fetchGeneralBalance(token);
+        const data = await fetchGeneralBalance();
         setReport(data);
       } catch (err) {
         setError(err.message);

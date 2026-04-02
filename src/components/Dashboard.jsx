@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchUserProfile } from "../utils/api";
+import { fetchAuthMe, logoutUser } from "../utils/api";
 
 import { ChurchContributionsProvider } from "./ChurchContributionsContext";
 import DashboardLayout from "./DashboardLayout";
@@ -18,21 +18,13 @@ export default function Dashboard() {
   const [currentView, setCurrentView] = useState("reports");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
     const loadUserData = async () => {
       try {
-        const data = await fetchUserProfile(token);
+        const data = await fetchAuthMe();
         setUserData(data);
       } catch (err) {
         setError(err.message);
-        if (err.message.includes("401")) {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-        }
+        window.location.href = "/login";
       } finally {
         setLoading(false);
       }
@@ -40,9 +32,12 @@ export default function Dashboard() {
     loadUserData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } finally {
+      window.location.href = "/";
+    }
   };
 
   const renderContent = () => {

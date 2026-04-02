@@ -1,8 +1,10 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import SessionRedirect from "../components/SessionRedirect.jsx";
 ---
 
 <Layout title="MyFinances - Gestión Financiera Personal">
+  <SessionRedirect client:load />
   <main class="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50">
     <!-- Hero Section -->
     <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">

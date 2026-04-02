@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { fetchReportsByMonth } from "../utils/api";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
@@ -24,24 +24,11 @@ export default function ReportsByMonth() {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setToken(localStorage.getItem("token"));
-    }
-  }, []);
-
   const handleFetch = async (month, year) => {
-    if (!token) {
-      setError("No hay token disponible");
-      window.location.href = "/";
-      return;
-    }
     setLoading(true);
     setError("");
     try {
-      const data = await fetchReportsByMonth(month, year, token);
+      const data = await fetchReportsByMonth(month, year);
       setReports(data);
     } catch (err) {
       setError(err.message || "Error al obtener reportes");

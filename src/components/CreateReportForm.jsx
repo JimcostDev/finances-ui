@@ -61,9 +61,6 @@ export default function CreateReportForm() {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No autenticado");
-
       const ofrendaPct = churchEnabled
         ? (parseFloat(formData.porcentaje_ofrenda) || 0) / 100
         : 0;
@@ -84,7 +81,7 @@ export default function CreateReportForm() {
         porcentaje_ofrenda: ofrendaPct,
       };
 
-      await createReport(payload, token);
+      await createReport(payload);
       setSuccess("¡Reporte creado exitosamente!");
       setTimeout(() => (window.location.href = "/dashboard"), 1500);
     } catch (err) {
@@ -97,9 +94,7 @@ export default function CreateReportForm() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const cats = await fetchCategories(token);
+        const cats = await fetchCategories();
         setCategories(Array.isArray(cats) ? cats : []);
       } catch {
         setCategories([]);
