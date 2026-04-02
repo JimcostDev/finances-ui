@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { createReport } from "@utils/api";
+import React, { useEffect, useMemo, useState } from "react";
+import { createReport, fetchCategories } from "@utils/api";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function CreateReportForm() {
   const churchEnabled = useChurchContributions();
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     month: "",
     year: new Date().getFullYear(),
-    ingresos: [{ concepto: "", monto: "" }],
-    gastos: [{ concepto: "", monto: "" }],
+    ingresos: [{ categoria_id: "", concepto: "", monto: "" }],
+    gastos: [{ categoria_id: "", concepto: "", monto: "" }],
     porcentaje_ofrenda: "",
   });
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,14 @@ export default function CreateReportForm() {
   const addEntry = (section) => {
     setFormData((prev) => ({
       ...prev,
-      [section]: [...prev[section], { concepto: "", monto: "" }],
+      [section]: [
+        ...prev[section],
+        {
+          categoria_id: "",
+          concepto: "",
+          monto: "",
+        },
+      ],
     }));
   };
 
@@ -64,11 +72,13 @@ export default function CreateReportForm() {
         ...formData,
         year: parseInt(formData.year, 10),
         ingresos: formData.ingresos.map((i) => ({
-          concepto: i.concepto,
+          ...(i.categoria_id ? { categoria_id: i.categoria_id } : {}),
+          concepto: i.concepto || "",
           monto: Math.abs(parseFloat(i.monto)) || 0,
         })),
         gastos: formData.gastos.map((g) => ({
-          concepto: g.concepto,
+          ...(g.categoria_id ? { categoria_id: g.categoria_id } : {}),
+          concepto: g.concepto || "",
           monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
         porcentaje_ofrenda: ofrendaPct,
@@ -83,6 +93,30 @@ export default function CreateReportForm() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const cats = await fetchCategories(token);
+        setCategories(Array.isArray(cats) ? cats : []);
+      } catch {
+        setCategories([]);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const categoriesByType = useMemo(() => {
+    const ingreso = [];
+    const gasto = [];
+    for (const c of categories) {
+      if (c?.tipo === "ingreso") ingreso.push(c);
+      else if (c?.tipo === "gasto") gasto.push(c);
+    }
+    return { ingreso, gasto };
+  }, [categories]);
 
   const getSectionTotal = (section) => {
     return formData[section].reduce((sum, item) => sum + (parseFloat(item.monto) || 0), 0);
@@ -210,17 +244,30 @@ export default function CreateReportForm() {
                   {formData.ingresos.map((entry, index) => (
                     <div
                       key={index}
-                      className="flex gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
+                      <select
+                        value={entry.categoria_id || ""}
+                        onChange={(e) =>
+                          handleInputChange("ingresos", index, "categoria_id", e.target.value)
+                        }
+                        className="sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                      >
+                        <option value="">-- Sin Clasificar --</option>
+                        {categoriesByType.ingreso.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.nombre}
+                          </option>
+                        ))}
+                      </select>
                       <input
                         type="text"
                         value={entry.concepto}
                         onChange={(e) =>
                           handleInputChange("ingresos", index, "concepto", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Concepto"
-                        required
+                        className="sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="Detalles (opcional)"
                       />
                       <input
                         type="number"
@@ -229,14 +276,14 @@ export default function CreateReportForm() {
                         onChange={(e) =>
                           handleInputChange("ingresos", index, "monto", e.target.value)
                         }
-                        className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="$0.00"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => removeEntry("ingresos", index)}
-                        className="w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center flex-shrink-0"
+                        className="sm:col-span-1 w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center justify-self-end"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -303,17 +350,30 @@ export default function CreateReportForm() {
                   {formData.gastos.map((entry, index) => (
                     <div
                       key={index}
-                      className="flex gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
+                      <select
+                        value={entry.categoria_id || ""}
+                        onChange={(e) =>
+                          handleInputChange("gastos", index, "categoria_id", e.target.value)
+                        }
+                        className="sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                      >
+                        <option value="">-- Sin Clasificar --</option>
+                        {categoriesByType.gasto.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.nombre}
+                          </option>
+                        ))}
+                      </select>
                       <input
                         type="text"
                         value={entry.concepto}
                         onChange={(e) =>
                           handleInputChange("gastos", index, "concepto", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Concepto"
-                        required
+                        className="sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="Detalles (opcional)"
                       />
                       <input
                         type="number"
@@ -322,14 +382,14 @@ export default function CreateReportForm() {
                         onChange={(e) =>
                           handleInputChange("gastos", index, "monto", e.target.value)
                         }
-                        className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="$0.00"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => removeEntry("gastos", index)}
-                        className="w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center flex-shrink-0"
+                        className="sm:col-span-1 w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center justify-self-end"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

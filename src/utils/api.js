@@ -1,5 +1,5 @@
 const API_BASE_URL = "https://finances.koyeb.app";
-// const API_BASE_URL = "http://localhost:3000";
+//const API_BASE_URL = "http://localhost:3000";
 
 // Función para registrar un usuario
 export async function registerUser(userData) {
@@ -212,5 +212,20 @@ export async function fetchGeneralBalance(token) {
     throw new Error(errorData.error || "Error al obtener el balance general");
   }
 
+  return await response.json();
+}
+
+// Función para obtener categorías
+export async function fetchCategories(token) {
+  const response = await fetch(`${API_BASE_URL}/api/categories`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Error al obtener categorías");
+  }
   return await response.json();
 }

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { getReportById, updateReport, fetchUserProfile } from "../utils/api";
+import React, { useMemo, useState, useEffect } from "react";
+import { fetchCategories, fetchUserProfile, getReportById, updateReport } from "../utils/api";
 
 export default function EditReportForm({ reportId }) {
   const [formData, setFormData] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [churchEnabled, setChurchEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,14 +27,35 @@ export default function EditReportForm({ reportId }) {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No autenticado");
 
-        const [profile, report] = await Promise.all([
+        const [profile, report, cats] = await Promise.all([
           fetchUserProfile(token),
           getReportById(reportId, token),
+          fetchCategories(token),
         ]);
 
         setChurchEnabled(Boolean(profile.enable_church_contributions));
+        setCategories(Array.isArray(cats) ? cats : []);
+
+        const normalizeEntries = (arr) => {
+          if (!Array.isArray(arr)) return [];
+          return arr.map((e) => {
+            const id = e?.id || e?._id || "";
+            const categoria_id = e?.categoria_id || "";
+            return {
+              ...e,
+              id,
+              _id: e?._id || id,
+              categoria_id,
+              concepto: e?.concepto || "",
+              monto: e?.monto ?? "",
+            };
+          });
+        };
+
         setFormData({
           ...report,
+          ingresos: normalizeEntries(report.ingresos),
+          gastos: normalizeEntries(report.gastos),
           porcentaje_ofrenda: report.porcentaje_ofrenda * 100,
         });
       } catch (err) {
@@ -45,6 +67,16 @@ export default function EditReportForm({ reportId }) {
 
     loadReport();
   }, [reportId]);
+
+  const categoriesByType = useMemo(() => {
+    const ingreso = [];
+    const gasto = [];
+    for (const c of categories) {
+      if (c?.tipo === "ingreso") ingreso.push(c);
+      else if (c?.tipo === "gasto") gasto.push(c);
+    }
+    return { ingreso, gasto };
+  }, [categories]);
 
   const handleInputChange = (section, index, field, value) => {
     const newData = [...formData[section]];
@@ -58,8 +90,10 @@ export default function EditReportForm({ reportId }) {
       [section]: [
         ...prev[section],
         {
+          categoria_id: "",
           concepto: "",
           monto: "",
+          id: `new-${Date.now()}`,
           _id: `new-${Date.now()}`,
         },
       ],
@@ -98,11 +132,15 @@ export default function EditReportForm({ reportId }) {
         ...formData,
         year: parseInt(formData.year, 10),
         ingresos: formData.ingresos.map((i) => ({
-          ...i,
+          ...(i?.id && /^[0-9a-fA-F]{24}$/.test(i.id) ? { id: i.id } : {}),
+          ...(i?.categoria_id ? { categoria_id: i.categoria_id } : {}),
+          concepto: i?.concepto || "",
           monto: Math.abs(parseFloat(i.monto)) || 0,
         })),
         gastos: formData.gastos.map((g) => ({
-          ...g,
+          ...(g?.id && /^[0-9a-fA-F]{24}$/.test(g.id) ? { id: g.id } : {}),
+          ...(g?.categoria_id ? { categoria_id: g.categoria_id } : {}),
+          concepto: g?.concepto || "",
           monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
         porcentaje_ofrenda: ofrendaPct,
@@ -268,18 +306,31 @@ export default function EditReportForm({ reportId }) {
                 <div className="max-h-96 overflow-y-auto p-3 space-y-2">
                   {formData.ingresos.map((entry, index) => (
                     <div
-                      key={entry._id}
-                      className="flex gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      key={entry.id || entry._id || index}
+                      className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
+                      <select
+                        value={entry.categoria_id || ""}
+                        onChange={(e) =>
+                          handleInputChange("ingresos", index, "categoria_id", e.target.value)
+                        }
+                        className="sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                      >
+                        <option value="">-- Sin Clasificar --</option>
+                        {categoriesByType.ingreso.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.nombre}
+                          </option>
+                        ))}
+                      </select>
                       <input
                         type="text"
                         value={entry.concepto}
                         onChange={(e) =>
                           handleInputChange("ingresos", index, "concepto", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Concepto"
-                        required
+                        className="sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="Detalles (opcional)"
                       />
                       <input
                         type="number"
@@ -288,14 +339,14 @@ export default function EditReportForm({ reportId }) {
                         onChange={(e) =>
                           handleInputChange("ingresos", index, "monto", e.target.value)
                         }
-                        className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="$0.00"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => removeEntry("ingresos", index)}
-                        className="w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center flex-shrink-0"
+                        className="sm:col-span-1 w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center justify-self-end"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -361,18 +412,31 @@ export default function EditReportForm({ reportId }) {
                 <div className="max-h-96 overflow-y-auto p-3 space-y-2">
                   {formData.gastos.map((entry, index) => (
                     <div
-                      key={entry._id}
-                      className="flex gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      key={entry.id || entry._id || index}
+                      className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
+                      <select
+                        value={entry.categoria_id || ""}
+                        onChange={(e) =>
+                          handleInputChange("gastos", index, "categoria_id", e.target.value)
+                        }
+                        className="sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                      >
+                        <option value="">-- Sin Clasificar --</option>
+                        {categoriesByType.gasto.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.nombre}
+                          </option>
+                        ))}
+                      </select>
                       <input
                         type="text"
                         value={entry.concepto}
                         onChange={(e) =>
                           handleInputChange("gastos", index, "concepto", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Concepto"
-                        required
+                        className="sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="Detalles (opcional)"
                       />
                       <input
                         type="number"
@@ -381,14 +445,14 @@ export default function EditReportForm({ reportId }) {
                         onChange={(e) =>
                           handleInputChange("gastos", index, "monto", e.target.value)
                         }
-                        className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="$0.00"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => removeEntry("gastos", index)}
-                        className="w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center flex-shrink-0"
+                        className="sm:col-span-1 w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center justify-self-end"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
