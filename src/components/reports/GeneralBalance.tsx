@@ -3,6 +3,7 @@ import type { IFinancialSummary } from "@interfaces";
 import { fetchGeneralBalance } from "@services";
 import { getErrorMessage } from "@utils/error";
 import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
+import Title from "@components/layout/Title.tsx";
 
 export default function GeneralBalance() {
   const churchEnabled = useChurchContributions();
@@ -48,9 +49,9 @@ export default function GeneralBalance() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8 space-y-2">
           {/* Título Azul-Verde */}
-          <h2 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          <Title as="h2" size="lg">
             Balance General
-          </h2>
+          </Title>
           <p className="text-gray-600">
             Resumen histórico de todos tus movimientos financieros
           </p>
@@ -64,9 +65,9 @@ export default function GeneralBalance() {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Liquidación Total</p>
                   {/* Balance con degradado Azul-Verde */}
-                  <p className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                  <Title as="p" size="lg">
                     {`$${report.liquidacion_final.toFixed(2)}`}
-                  </p>
+                  </Title>
                 </div>
                 <div className="text-right">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">

@@ -9,6 +9,8 @@ import type {
 } from "@interfaces";
 import { fetchCategories, fetchUserProfile, getReportById, updateReport } from "@services";
 import { getErrorMessage } from "@utils/error";
+import FormStickyActions from "@components/layout/FormStickyActions.tsx";
+import Title from "@components/layout/Title.tsx";
 
 interface EditReportFormProps {
   reportId: string;
@@ -42,6 +44,8 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
     ingresos: false,
     gastos: false,
   });
+  /** En móvil solo una sección visible (pestañas); en lg ambas columnas. */
+  const [mobilePanel, setMobilePanel] = useState<"ingresos" | "gastos">("gastos");
 
   useEffect(() => {
     const loadReport = async () => {
@@ -211,95 +215,139 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header compacto */}
+    <div className="min-h-screen bg-gray-50 py-6 px-3 sm:px-4 max-w-full min-w-0 overflow-x-hidden">
+      <div className="max-w-6xl mx-auto min-w-0">
         <div className="bg-white rounded-xl shadow-md p-4 mb-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
+            <div className="min-w-0">
+              <Title as="h2" size="sm">
                 Editar Reporte
-              </h2>
-              <p className="text-gray-600 capitalize">
-                {formData.month} {formData.year}
-              </p>
+              </Title>
             </div>
 
-            {/* Mes, Año y Ofrenda en header */}
-            <div className="flex gap-2 w-full sm:w-auto">
-              <select
-                value={formData.month}
-                onChange={(e) =>
-                  setFormData((prev) =>
-                    prev ? { ...prev, month: e.target.value } : prev
-                  )
-                }
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              >
-                {[
-                  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-                  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-                ].map((mes) => (
-                  <option key={mes} value={mes}>
-                    {mes.charAt(0).toUpperCase() + mes.slice(1)}
-                  </option>
-                ))}
-              </select>
+            <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:max-w-2xl sm:grid-cols-2 lg:grid-cols-3 lg:justify-items-stretch">
+              <div className="min-w-0">
+                <label htmlFor="edit-report-month" className="mb-1 block text-xs font-medium text-gray-700">
+                  Mes
+                </label>
+                <select
+                  id="edit-report-month"
+                  value={formData.month}
+                  onChange={(e) =>
+                    setFormData((prev) =>
+                      prev ? { ...prev, month: e.target.value } : prev
+                    )
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  {[
+                    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+                    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+                  ].map((mes) => (
+                    <option key={mes} value={mes}>
+                      {mes.charAt(0).toUpperCase() + mes.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <input
-                type="number"
-                value={formData.year}
-                onChange={(e) => {
-                  const n = e.target.valueAsNumber;
-                  setFormData((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          year: Number.isNaN(n) ? prev.year : n,
-                        }
-                      : prev
-                  );
-                }}
-                className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-
-              {churchEnabled && (
+              <div className="min-w-0">
+                <label htmlFor="edit-report-year" className="mb-1 block text-xs font-medium text-gray-700">
+                  Año
+                </label>
                 <input
+                  id="edit-report-year"
                   type="number"
-                  step="1"
-                  min="1"
-                  max="99"
-                  value={formData.porcentaje_ofrenda}
+                  value={formData.year}
                   onChange={(e) => {
                     const n = e.target.valueAsNumber;
                     setFormData((prev) =>
                       prev
                         ? {
                             ...prev,
-                            porcentaje_ofrenda: Number.isNaN(n)
-                              ? prev.porcentaje_ofrenda
-                              : n,
+                            year: Number.isNaN(n) ? prev.year : n,
                           }
                         : prev
                     );
                   }}
-                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="% Ofr"
-                  title="Porcentaje de Ofrenda"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 sm:max-w-[8rem]"
                   required
                 />
+              </div>
+
+              {churchEnabled && (
+                <div className="min-w-0 sm:col-span-2 lg:col-span-1">
+                  <label htmlFor="edit-report-ofrenda" className="mb-1 block text-xs font-medium text-gray-700">
+                    Porcentaje de ofrenda
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="edit-report-ofrenda"
+                      type="number"
+                      step="1"
+                      min="1"
+                      max="99"
+                      value={formData.porcentaje_ofrenda}
+                      onChange={(e) => {
+                        const n = e.target.valueAsNumber;
+                        setFormData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                porcentaje_ofrenda: Number.isNaN(n)
+                                  ? prev.porcentaje_ofrenda
+                                  : n,
+                              }
+                            : prev
+                        );
+                      }}
+                      className="w-full min-w-0 max-w-[6rem] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                      required
+                      aria-describedby="edit-report-ofrenda-desc"
+                    />
+                    <span className="text-sm text-gray-600" aria-hidden>
+                      %
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Grid de 2 columnas para Ingresos y Gastos */}
+        <form onSubmit={handleSubmit} className="space-y-4 pb-36 lg:pb-8">
+          <div className="flex lg:hidden rounded-xl p-1 bg-gray-200/80 mb-1 gap-1 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setMobilePanel("ingresos")}
+              className={`flex-1 py-2.5 px-2 rounded-lg text-sm font-semibold transition-colors ${
+                mobilePanel === "ingresos"
+                  ? "bg-white text-green-800 shadow"
+                  : "text-gray-600"
+              }`}
+            >
+              Ingresos ({formData.ingresos.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobilePanel("gastos")}
+              className={`flex-1 py-2.5 px-2 rounded-lg text-sm font-semibold transition-colors ${
+                mobilePanel === "gastos"
+                  ? "bg-white text-red-800 shadow"
+                  : "text-gray-600"
+              }`}
+            >
+              Gastos ({formData.gastos.length})
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Sección Ingresos */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div
+              className={`bg-white rounded-xl shadow-md overflow-hidden ${
+                mobilePanel === "ingresos" ? "block" : "hidden lg:block"
+              }`}
+            >
               {/* Header de sección */}
               <div className="bg-green-50 border-b border-green-100 p-3">
                 <div className="flex justify-between items-center">
@@ -344,18 +392,18 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
 
               {/* Lista de entradas con scroll */}
               {!collapsedSections.ingresos && (
-                <div className="max-h-96 overflow-y-auto p-3 space-y-2">
+                <div className="max-h-[min(58vh,24rem)] lg:max-h-96 min-h-0 overflow-y-auto overscroll-contain touch-pan-y p-3 space-y-2 [-webkit-overflow-scrolling:touch]">
                   {formData.ingresos.map((entry, index) => (
                     <div
                       key={entry.id || entry._id || index}
-                      className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="grid grid-cols-1 gap-2 sm:grid-cols-12 sm:items-center bg-gray-50 p-3 rounded-lg min-w-0 max-w-full hover:bg-gray-100 transition-colors"
                     >
                       <select
                         value={entry.categoria_id || ""}
                         onChange={(e) =>
                           handleInputChange("ingresos", index, "categoria_id", e.target.value)
                         }
-                        className="sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                        className="w-full min-w-0 sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       >
                         <option value="">-- Sin Clasificar --</option>
                         {categoriesByType.ingreso.map((cat) => (
@@ -370,29 +418,32 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
                         onChange={(e) =>
                           handleInputChange("ingresos", index, "concepto", e.target.value)
                         }
-                        className="sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="w-full min-w-0 sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="Detalles (opcional)"
                       />
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={entry.monto}
-                        onChange={(e) =>
-                          handleInputChange("ingresos", index, "monto", e.target.value)
-                        }
-                        className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="$0.00"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeEntry("ingresos", index)}
-                        className="sm:col-span-1 w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center justify-self-end"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                      <div className="flex gap-2 items-center min-w-0 sm:contents">
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={entry.monto}
+                          onChange={(e) =>
+                            handleInputChange("ingresos", index, "monto", e.target.value)
+                          }
+                          className="min-w-0 flex-1 sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="$0.00"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeEntry("ingresos", index)}
+                          className="shrink-0 w-10 h-10 sm:col-span-1 sm:w-8 sm:h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+                          aria-label="Eliminar línea"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   ))}
                   {formData.ingresos.length === 0 && (
@@ -404,8 +455,11 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
               )}
             </div>
 
-            {/* Sección Gastos */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div
+              className={`bg-white rounded-xl shadow-md overflow-hidden ${
+                mobilePanel === "gastos" ? "block" : "hidden lg:block"
+              }`}
+            >
               {/* Header de sección */}
               <div className="bg-red-50 border-b border-red-100 p-3">
                 <div className="flex justify-between items-center">
@@ -450,18 +504,18 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
 
               {/* Lista de entradas con scroll */}
               {!collapsedSections.gastos && (
-                <div className="max-h-96 overflow-y-auto p-3 space-y-2">
+                <div className="max-h-[min(58vh,24rem)] lg:max-h-96 min-h-0 overflow-y-auto overscroll-contain touch-pan-y p-3 space-y-2 [-webkit-overflow-scrolling:touch]">
                   {formData.gastos.map((entry, index) => (
                     <div
                       key={entry.id || entry._id || index}
-                      className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="grid grid-cols-1 gap-2 sm:grid-cols-12 sm:items-center bg-gray-50 p-3 rounded-lg min-w-0 max-w-full hover:bg-gray-100 transition-colors"
                     >
                       <select
                         value={entry.categoria_id || ""}
                         onChange={(e) =>
                           handleInputChange("gastos", index, "categoria_id", e.target.value)
                         }
-                        className="sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                        className="w-full min-w-0 sm:col-span-4 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       >
                         <option value="">-- Sin Clasificar --</option>
                         {categoriesByType.gasto.map((cat) => (
@@ -476,29 +530,32 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
                         onChange={(e) =>
                           handleInputChange("gastos", index, "concepto", e.target.value)
                         }
-                        className="sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full min-w-0 sm:col-span-5 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="Detalles (opcional)"
                       />
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={entry.monto}
-                        onChange={(e) =>
-                          handleInputChange("gastos", index, "monto", e.target.value)
-                        }
-                        className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="$0.00"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeEntry("gastos", index)}
-                        className="sm:col-span-1 w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center justify-self-end"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                      <div className="flex gap-2 items-center min-w-0 sm:contents">
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={entry.monto}
+                          onChange={(e) =>
+                            handleInputChange("gastos", index, "monto", e.target.value)
+                          }
+                          className="min-w-0 flex-1 sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          placeholder="$0.00"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeEntry("gastos", index)}
+                          className="shrink-0 w-10 h-10 sm:col-span-1 sm:w-8 sm:h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+                          aria-label="Eliminar línea"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   ))}
                   {formData.gastos.length === 0 && (
@@ -530,35 +587,17 @@ export default function EditReportForm({ reportId }: EditReportFormProps) {
             </div>
           )}
 
-          {/* Botones de acción - Sticky al final */}
-          <div className="sticky bottom-0 bg-white rounded-xl shadow-lg p-4 border border-gray-200">
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => window.history.back()}
-                className="flex-1 py-3 px-6 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="flex-1 py-3 px-6 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </span>
-                ) : (
-                  "Guardar Cambios"
-                )}
-              </button>
-            </div>
-          </div>
+          <FormStickyActions
+            cancelLabel="Cancelar"
+            submitLabel="Guardar"
+            loadingLabel="Guardando…"
+            loading={saving}
+            onCancel={() => {
+              window.location.href = "/dashboard";
+            }}
+            cancelDisabled={saving}
+            primaryDisabled={saving}
+          />
         </form>
       </div>
     </div>

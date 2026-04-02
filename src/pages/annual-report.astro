@@ -1,11 +1,10 @@
 ---
-import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import SectionContainer from "@components/layout/SectionContainer.astro";
-import AnnualReport from "@components/reports/AnnualReport.tsx";
+import AnnualReportView from "@components/reports/AnnualReport.tsx";
 ---
 <Layout title="Reporte Anual - MyFinances">
   <SectionContainer id="annual-report">
-    <AnnualReport client:load />
+    <AnnualReportView client:load />
   </SectionContainer>
 </Layout>

@@ -8,7 +8,6 @@ import DashboardLayout from "./DashboardLayout";
 import AnnualReport from "../reports/AnnualReport";
 import CreateReportForm from "../reports/CreateReportForm";
 import GeneralBalance from "../reports/GeneralBalance";
-import ReportsByMonth from "../reports/ReportsByMonth";
 import ViewSelector from "../reports/ViewSelector";
 import UserProfile from "../user/UserProfile";
 
@@ -49,7 +48,7 @@ export default function Dashboard() {
       case "general": return <GeneralBalance />;
       case "create-report": return <CreateReportForm />;
       case "user": return <UserProfile />;
-      default: return <ReportsByMonth />;
+      default: return <ViewSelector />;
     }
   };
 

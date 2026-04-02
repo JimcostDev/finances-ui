@@ -1,12 +1,11 @@
 ---
-import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import SectionContainer from "@components/layout/SectionContainer.astro";
-import GeneralBalance from "@components/reports/GeneralBalance.tsx";
+import GeneralBalanceView from "@components/reports/GeneralBalance.tsx";
 ---
 
 <Layout title="Balance General - MyFinances">
   <SectionContainer id="general-balance">
-    <GeneralBalance client:load />
+    <GeneralBalanceView client:load />
   </SectionContainer>
 </Layout>

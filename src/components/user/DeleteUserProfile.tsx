@@ -2,6 +2,8 @@ import React, { useState, type ChangeEventHandler } from "react";
 import { USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE } from "@interfaces";
 import { deleteUserProfile, logoutUser } from "@services";
 import { getErrorMessage } from "@utils/error";
+import FormStickyActions from "@components/layout/FormStickyActions.tsx";
+import Title from "@components/layout/Title.tsx";
 
 /**
  * Sin props en la versión actual: el borrado usa la sesión (cookie HttpOnly).
@@ -47,7 +49,7 @@ export default function DeleteUserProfileForm() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4 pb-36">
       <div className="max-w-2xl w-full space-y-6">
         {/* Card principal con advertencia */}
         <div className="bg-white rounded-2xl shadow-xl border border-red-200 overflow-hidden">
@@ -58,9 +60,9 @@ export default function DeleteUserProfileForm() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">
+            <Title as="h2" variant="onDark" size="md" className="mb-2">
               Eliminar Cuenta
-            </h2>
+            </Title>
             <p className="text-red-100">
               Esta acción es permanente e irreversible
             </p>
@@ -144,45 +146,6 @@ export default function DeleteUserProfileForm() {
               )}
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <button
-                type="button"
-                onClick={() => window.history.back()}
-                disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-semibold border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Cancelar
-              </button>
-
-              <button
-                onClick={handleDelete}
-                disabled={
-                  loading ||
-                  confirmation.trim().toLowerCase() !==
-                    USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE
-                }
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-red-600 to-orange-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none"
-              >
-                {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Eliminando...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Eliminar Cuenta Permanentemente
-                  </>
-                )}
-              </button>
-            </div>
-
             {/* Nota final */}
             <p className="text-center text-sm text-gray-500 pt-4">
               ¿Tienes dudas?{" "}
@@ -210,6 +173,24 @@ export default function DeleteUserProfileForm() {
           </div>
         </div>
       </div>
+
+      <FormStickyActions
+        variant="danger"
+        primaryButtonType="button"
+        onPrimaryClick={handleDelete}
+        submitLabel="Hasta la vista, baby"
+        loadingLabel="Eliminando…"
+        loading={loading}
+        primaryDisabled={
+          loading ||
+          confirmation.trim().toLowerCase() !== USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE
+        }
+        onCancel={() => {
+          window.location.href = "/dashboard";
+        }}
+        cancelDisabled={loading}
+        maxWidthClass="max-w-2xl mx-auto w-full"
+      />
     </div>
   );
 }

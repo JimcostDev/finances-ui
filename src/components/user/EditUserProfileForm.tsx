@@ -7,6 +7,8 @@ import {
   passwordStrengthBarClass,
   passwordStrengthLabel,
 } from "@utils/passwordStrength";
+import FormStickyActions from "@components/layout/FormStickyActions.tsx";
+import Title from "@components/layout/Title.tsx";
 
 interface EditUserProfileFormProps {
   initialData: IUser;
@@ -87,9 +89,9 @@ export default function EditUserProfileForm({ initialData }: EditUserProfileForm
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 space-y-2">
-          <h2 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          <Title as="h2" size="md">
             Editar Perfil
-          </h2>
+          </Title>
           <p className="text-gray-600">
             Actualiza tu información personal
           </p>
@@ -97,7 +99,7 @@ export default function EditUserProfileForm({ initialData }: EditUserProfileForm
 
         {/* Card principal */}
         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 pb-36 lg:pb-8">
             {/* Información Personal */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -356,34 +358,18 @@ export default function EditUserProfileForm({ initialData }: EditUserProfileForm
               </div>
             )}
 
-            {/* Botones */}
-            <div className="flex gap-3 pt-4">
-              <button
-                type="button"
-                onClick={() => window.history.back()}
-                className="flex-1 py-3 px-6 bg-gray-200 text-gray-800 font-semibold rounded-xl hover:bg-gray-300 transition-colors"
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-3 px-6 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </span>
-                ) : (
-                  "Guardar Cambios"
-                )}
-              </button>
-            </div>
+            <FormStickyActions
+              cancelLabel="Cancelar"
+              submitLabel="Guardar"
+              loadingLabel="Guardando…"
+              loading={loading}
+              onCancel={() => {
+                window.location.href = "/dashboard";
+              }}
+              cancelDisabled={loading}
+              primaryDisabled={loading}
+              maxWidthClass="max-w-2xl mx-auto w-full"
+            />
           </form>
         </div>
       </div>

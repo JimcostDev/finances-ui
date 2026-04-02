@@ -1,10 +1,12 @@
 ---
-import '../../styles/global.css';
 import Layout from '../../layouts/Layout.astro';
 import SectionContainer from "@components/layout/SectionContainer.astro";
 import DeleteReportForm from "@components/reports/DeleteReportForm.tsx";
 
-const { id } = Astro.params;
+const id = Astro.params.id;
+if (!id) {
+  return Astro.redirect("/reports");
+}
 ---
 <Layout title="Eliminar Reporte">
   <SectionContainer id="delete-report">
