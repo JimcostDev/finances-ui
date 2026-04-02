@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import type { IUser } from "@interfaces";
 import { fetchUserProfile } from "@services";
+import { getErrorMessage } from "@utils/error";
 
-const ProfileItem = ({ icon, label, value }) => (
+interface ProfileItemProps {
+  icon: string;
+  label: string;
+  value: string;
+}
+
+const ProfileItem = ({ icon, label, value }: ProfileItemProps) => (
   <div className="group p-4 hover:bg-linear-to-r hover:from-blue-50 hover:to-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200">
     <div className="flex items-start gap-4">
       <div className="w-10 h-10 bg-linear-to-br from-blue-100 to-green-100 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
@@ -16,18 +24,18 @@ const ProfileItem = ({ icon, label, value }) => (
 );
 
 export default function UserProfile() {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const data = await fetchUserProfile();
         setUserData(data);
-      } catch (err) {
-        setError(err.message);
-        window.location.href = '/login';
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "Sesión no válida"));
+        window.location.href = "/login";
       } finally {
         setLoading(false);
       }
@@ -67,6 +75,10 @@ export default function UserProfile() {
         </div>
       </div>
     );
+  }
+
+  if (!userData) {
+    return null;
   }
 
   return (
@@ -148,12 +160,16 @@ export default function UserProfile() {
             <ProfileItem 
               icon="📅"
               label="Miembro desde" 
-              value={new Date(userData.created_at).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                timeZone: 'UTC'
-              })}
+              value={
+                userData.created_at
+                  ? new Date(userData.created_at).toLocaleDateString("es-ES", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      timeZone: "UTC",
+                    })
+                  : "—"
+              }
             />
             <ProfileItem
               icon="⛪"

@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import type { IUser } from "@interfaces";
 import { fetchUserProfile } from "@services";
-import EditUserProfileForm from './EditUserProfileForm';
+import { getErrorMessage } from "@utils/error";
+import EditUserProfileForm from "./EditUserProfileForm";
 
 export default function EditUserProfilePage() {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const data = await fetchUserProfile();
         setUserData(data);
-      } catch (err) {
-        setError(err.message);
-        window.location.href = '/login';
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "No se pudo cargar el perfil"));
+        window.location.href = "/login";
       } finally {
         setLoading(false);
       }
@@ -63,6 +65,10 @@ export default function EditUserProfilePage() {
         </div>
       </div>
     );
+  }
+
+  if (!userData) {
+    return null;
   }
 
   return <EditUserProfileForm initialData={userData} />;

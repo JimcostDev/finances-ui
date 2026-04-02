@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import type { ChangeEventHandler, SubmitEventHandler } from "react";
+import type { IRegisterRequest } from "@interfaces";
 import { registerUser } from "@services";
 import { getErrorMessage } from "@utils/error";
+import {
+  computePasswordStrength,
+  passwordStrengthBarClass,
+  passwordStrengthLabel,
+} from "@utils/passwordStrength";
 
 export default function RegisterForm() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<IRegisterRequest>({
     email: "",
     username: "",
     password: "",
     confirm_password: "",
-    fullname: ""
+    fullname: "",
   });
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -23,15 +29,8 @@ export default function RegisterForm() {
       [e.target.name]: e.target.value
     });
 
-    // Calcular fortaleza de contraseña
     if (e.target.name === "password") {
-      const pass = e.target.value;
-      let strength = 0;
-      if (pass.length >= 8) strength++;
-      if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) strength++;
-      if (/[0-9]/.test(pass)) strength++;
-      if (/[^a-zA-Z0-9]/.test(pass)) strength++;
-      setPasswordStrength(strength);
+      setPasswordStrength(computePasswordStrength(e.target.value));
     }
   };
 
@@ -66,22 +65,6 @@ export default function RegisterForm() {
       setMessage({ text: getErrorMessage(error, "Error al crear la cuenta"), type: "error" });
       setIsLoading(false);
     }
-  };
-
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength === 0) return "bg-gray-200";
-    if (passwordStrength === 1) return "bg-red-500";
-    if (passwordStrength === 2) return "bg-yellow-500";
-    if (passwordStrength === 3) return "bg-blue-500";
-    return "bg-green-500";
-  };
-
-  const getPasswordStrengthText = () => {
-    if (passwordStrength === 0) return "";
-    if (passwordStrength === 1) return "Débil";
-    if (passwordStrength === 2) return "Regular";
-    if (passwordStrength === 3) return "Buena";
-    return "Excelente";
   };
 
   return (
@@ -228,14 +211,14 @@ export default function RegisterForm() {
                       <div
                         key={level}
                         className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                          level <= passwordStrength ? getPasswordStrengthColor() : "bg-gray-200"
+                          level <= passwordStrength ? passwordStrengthBarClass(passwordStrength) : "bg-gray-200"
                         }`}
                       />
                     ))}
                   </div>
                   {passwordStrength > 0 && (
                     <p className="text-xs text-gray-600">
-                      Contraseña: <span className="font-semibold">{getPasswordStrengthText()}</span>
+                      Contraseña: <span className="font-semibold">{passwordStrengthLabel(passwordStrength)}</span>
                     </p>
                   )}
                 </div>

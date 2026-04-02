@@ -19,8 +19,8 @@ export default function DeleteReportForm({ reportId }: { reportId: string }) {
     try {
       await deleteReport(reportId);
       window.location.href = '/reports';
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "No se pudo eliminar el reporte"));
     } finally {
       setLoading(false);
     }

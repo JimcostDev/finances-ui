@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import type { ChangeEventHandler, SubmitEventHandler } from "react";
+import type { ILoginRequest } from "@interfaces";
 import { fetchAuthMe, loginUser } from "@services";
 import { getErrorMessage } from "@utils/error";
 
 export default function LoginForm() {
-  const [credentials, setCredentials] = useState({
+  const [credentials, setCredentials] = useState<ILoginRequest>({
     email: "",
-    password: ""
+    password: "",
   });
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);

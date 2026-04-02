@@ -1,9 +1,38 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, type SubmitEventHandler } from "react";
+import type {
+  ICategory,
+  IEditReportFormState,
+  IExpense,
+  IIncome,
+  IReportLineForm,
+  IReportPayload,
+} from "@interfaces";
 import { fetchCategories, fetchUserProfile, getReportById, updateReport } from "@services";
+import { getErrorMessage } from "@utils/error";
 
-export default function EditReportForm({ reportId }) {
-  const [formData, setFormData] = useState(null);
-  const [categories, setCategories] = useState([]);
+interface EditReportFormProps {
+  reportId: string;
+}
+
+function normalizeEntries(arr: IIncome[] | IExpense[] | undefined): IReportLineForm[] {
+  if (!Array.isArray(arr)) return [];
+  return arr.map((e) => {
+    const id = e.id ?? e._id ?? "";
+    const categoria_id = e.categoria_id ?? "";
+    return {
+      ...e,
+      id,
+      _id: e._id ?? id,
+      categoria_id,
+      concepto: e.concepto ?? "",
+      monto: e.monto ?? "",
+    };
+  });
+}
+
+export default function EditReportForm({ reportId }: EditReportFormProps) {
+  const [formData, setFormData] = useState<IEditReportFormState | null>(null);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [churchEnabled, setChurchEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -33,30 +62,14 @@ export default function EditReportForm({ reportId }) {
         setChurchEnabled(Boolean(profile.enable_church_contributions));
         setCategories(Array.isArray(cats) ? cats : []);
 
-        const normalizeEntries = (arr) => {
-          if (!Array.isArray(arr)) return [];
-          return arr.map((e) => {
-            const id = e?.id || e?._id || "";
-            const categoria_id = e?.categoria_id || "";
-            return {
-              ...e,
-              id,
-              _id: e?._id || id,
-              categoria_id,
-              concepto: e?.concepto || "",
-              monto: e?.monto ?? "",
-            };
-          });
-        };
-
         setFormData({
           ...report,
           ingresos: normalizeEntries(report.ingresos),
           gastos: normalizeEntries(report.gastos),
           porcentaje_ofrenda: report.porcentaje_ofrenda * 100,
         });
-      } catch (err) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "Error al cargar el reporte"));
       } finally {
         setLoading(false);
       }
@@ -66,85 +79,101 @@ export default function EditReportForm({ reportId }) {
   }, [reportId]);
 
   const categoriesByType = useMemo(() => {
-    const ingreso = [];
-    const gasto = [];
+    const ingreso: ICategory[] = [];
+    const gasto: ICategory[] = [];
     for (const c of categories) {
-      if (c?.tipo === "ingreso") ingreso.push(c);
-      else if (c?.tipo === "gasto") gasto.push(c);
+      if (c.tipo === "ingreso") ingreso.push(c);
+      else if (c.tipo === "gasto") gasto.push(c);
     }
     return { ingreso, gasto };
   }, [categories]);
 
-  const handleInputChange = (section, index, field, value) => {
+  type SectionKey = "ingresos" | "gastos";
+  type LineField = "categoria_id" | "concepto" | "monto";
+
+  const handleInputChange = (section: SectionKey, index: number, field: LineField, value: string) => {
+    if (!formData) return;
     const newData = [...formData[section]];
-    newData[index][field] = value;
-    setFormData((prev) => ({ ...prev, [section]: newData }));
+    const row = { ...newData[index], [field]: value };
+    newData[index] = row;
+    setFormData((prev) => (prev ? { ...prev, [section]: newData } : prev));
   };
 
-  const addEntry = (section) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: [
-        ...prev[section],
-        {
-          categoria_id: "",
-          concepto: "",
-          monto: "",
-          id: `new-${Date.now()}`,
-          _id: `new-${Date.now()}`,
-        },
-      ],
-    }));
+  const addEntry = (section: SectionKey) => {
+    setFormData((prev) =>
+      prev
+        ? {
+            ...prev,
+            [section]: [
+              ...prev[section],
+              {
+                categoria_id: "",
+                concepto: "",
+                monto: "",
+                id: `new-${Date.now()}`,
+                _id: `new-${Date.now()}`,
+              },
+            ],
+          }
+        : prev
+    );
   };
 
-  const removeEntry = (section, index) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: prev[section].filter((_, i) => i !== index),
-    }));
+  const removeEntry = (section: SectionKey, index: number) => {
+    setFormData((prev) =>
+      prev
+        ? {
+            ...prev,
+            [section]: prev[section].filter((_, i) => i !== index),
+          }
+        : prev
+    );
   };
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: keyof typeof collapsedSections) => {
     setCollapsedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    if (!formData) return;
     setSaving(true);
     setError("");
     setSuccess("");
 
     try {
       const ofrendaPct = churchEnabled
-        ? (parseFloat(formData.porcentaje_ofrenda) || 0) / 100
+        ? (Number(formData.porcentaje_ofrenda) || 0) / 100
         : 0;
 
-      const payload = {
+      const payload: IReportPayload = {
         ...formData,
-        year: parseInt(formData.year, 10),
+        year: parseInt(String(formData.year), 10),
         ingresos: formData.ingresos.map((i) => ({
-          ...(i?.id && /^[0-9a-fA-F]{24}$/.test(i.id) ? { id: i.id } : {}),
-          ...(i?.categoria_id ? { categoria_id: i.categoria_id } : {}),
-          concepto: i?.concepto || "",
-          monto: Math.abs(parseFloat(i.monto)) || 0,
+          ...(i.id && /^[0-9a-fA-F]{24}$/.test(i.id) ? { id: i.id } : {}),
+          ...(i.categoria_id ? { categoria_id: i.categoria_id } : {}),
+          concepto: i.concepto || "",
+          monto: Math.abs(parseFloat(String(i.monto))) || 0,
         })),
         gastos: formData.gastos.map((g) => ({
-          ...(g?.id && /^[0-9a-fA-F]{24}$/.test(g.id) ? { id: g.id } : {}),
-          ...(g?.categoria_id ? { categoria_id: g.categoria_id } : {}),
-          concepto: g?.concepto || "",
-          monto: Math.abs(parseFloat(g.monto)) || 0,
+          ...(g.id && /^[0-9a-fA-F]{24}$/.test(g.id) ? { id: g.id } : {}),
+          ...(g.categoria_id ? { categoria_id: g.categoria_id } : {}),
+          concepto: g.concepto || "",
+          monto: Math.abs(parseFloat(String(g.monto))) || 0,
         })),
         porcentaje_ofrenda: ofrendaPct,
       };
 
       await updateReport(reportId, payload);
       setSuccess("¡Reporte actualizado exitosamente!");
-      setTimeout(() => (window.location.href = "/dashboard"), 1500);
-    } catch (err) {
-      setError(err.message);
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Error al guardar"));
     } finally {
       setSaving(false);
     }
@@ -176,8 +205,9 @@ export default function EditReportForm({ reportId }) {
     );
   }
 
-  const getSectionTotal = (section) => {
-    return formData[section].reduce((sum, item) => sum + (parseFloat(item.monto) || 0), 0);
+  const getSectionTotal = (section: SectionKey) => {
+    if (!formData) return 0;
+    return formData[section].reduce((sum, item) => sum + (parseFloat(String(item.monto)) || 0), 0);
   };
 
   return (
@@ -200,7 +230,9 @@ export default function EditReportForm({ reportId }) {
               <select
                 value={formData.month}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, month: e.target.value }))
+                  setFormData((prev) =>
+                    prev ? { ...prev, month: e.target.value } : prev
+                  )
                 }
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
@@ -218,9 +250,17 @@ export default function EditReportForm({ reportId }) {
               <input
                 type="number"
                 value={formData.year}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, year: e.target.value }))
-                }
+                onChange={(e) => {
+                  const n = e.target.valueAsNumber;
+                  setFormData((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          year: Number.isNaN(n) ? prev.year : n,
+                        }
+                      : prev
+                  );
+                }}
                 className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
@@ -232,12 +272,19 @@ export default function EditReportForm({ reportId }) {
                   min="1"
                   max="99"
                   value={formData.porcentaje_ofrenda}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      porcentaje_ofrenda: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => {
+                    const n = e.target.valueAsNumber;
+                    setFormData((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            porcentaje_ofrenda: Number.isNaN(n)
+                              ? prev.porcentaje_ofrenda
+                              : n,
+                          }
+                        : prev
+                    );
+                  }}
                   className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="% Ofr"
                   title="Porcentaje de Ofrenda"

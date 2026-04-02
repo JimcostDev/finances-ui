@@ -1,4 +1,5 @@
 import React, { useState, type SubmitEventHandler } from "react";
+import type { IFinancialSummary } from "@interfaces";
 import { fetchAnnualReport } from "@services";
 import { getErrorMessage } from "@utils/error";
 import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
@@ -6,17 +7,17 @@ import { useChurchContributions } from "../dashboard/ChurchContributionsContext"
 export default function AnnualReport() {
   const churchEnabled = useChurchContributions();
   const [selectedYear, setSelectedYear] = useState("");
-  const [report, setReport] = useState(null);
+  const [report, setReport] = useState<IFinancialSummary | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const handleFetch = async (year) => {
+  const handleFetch = async (year: number) => {
     setLoading(true);
     setError("");
     try {
-      const data = await fetchAnnualReport(Number(year));
+      const data = await fetchAnnualReport(year);
       setReport(data);
-    } catch (err) {
-      setError(err.message || "Error al obtener el reporte anual");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Error al obtener el reporte anual"));
     }
     setLoading(false);
   };
@@ -27,240 +28,13 @@ export default function AnnualReport() {
       setError("Por favor, selecciona un año.");
       return;
     }
-    handleFetch(selectedYear);
+    handleFetch(Number(selectedYear));
   };
 
   const handleCurrentDate = () => {
     const year = new Date().getFullYear();
-    setSelectedYear(year);
+    setSelectedYear(String(year));
     handleFetch(year);
-  };
-
-  const handleGeneratePDF = async () => {
-    // Importar jsPDF dinámicamente
-    const { jsPDF } = await import("jspdf");
-
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 20;
-    let yPos = margin;
-
-    // Función auxiliar para agregar texto centrado
-    const addCenteredText = (text, y, fontSize = 12, isBold = false) => {
-      doc.setFontSize(fontSize);
-      if (isBold) doc.setFont(undefined, "bold");
-      else doc.setFont(undefined, "normal");
-      const textWidth = doc.getTextWidth(text);
-      doc.text(text, (pageWidth - textWidth) / 2, y);
-    };
-
-    // Función para agregar línea horizontal
-    const addLine = (y) => {
-      doc.setDrawColor(59, 130, 246); // Azul
-      doc.setLineWidth(0.5);
-      doc.line(margin, y, pageWidth - margin, y);
-    };
-
-    // Header
-    doc.setFillColor(37, 99, 235); // Azul
-    doc.rect(0, 0, pageWidth, 40, "F");
-    doc.setTextColor(255, 255, 255);
-    addCenteredText("Reporte Anual MyFinances", 20, 20, true);
-    addCenteredText(`Año ${report.year}`, 30, 12);
-
-    yPos = 50;
-    doc.setTextColor(0, 0, 0);
-
-    // Balance destacado
-    doc.setFillColor(239, 246, 255); // Fondo azul claro
-    doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 25, 3, 3, "F");
-    doc.setFontSize(10);
-    doc.setTextColor(107, 114, 128);
-    doc.text("Balance Anual", margin + 5, yPos + 8);
-    doc.setFontSize(18);
-    doc.setTextColor(37, 99, 235);
-    doc.setFont(undefined, "bold");
-    doc.text(
-      `${parseFloat(report.liquidacion_final).toFixed(2)}`,
-      margin + 5,
-      yPos + 20
-    );
-
-    yPos += 35;
-
-    // Sección de Ingresos y Gastos
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("Métricas Principales", margin, yPos);
-    yPos += 10;
-
-    // Ingresos
-    doc.setFillColor(240, 253, 244); // Verde claro
-    doc.roundedRect(
-      margin,
-      yPos,
-      (pageWidth - 2 * margin - 5) / 2,
-      20,
-      2,
-      2,
-      "F"
-    );
-    doc.setFontSize(9);
-    doc.setTextColor(21, 128, 61);
-    doc.setFont(undefined, "bold");
-    doc.text("INGRESOS BRUTO", margin + 3, yPos + 6);
-    doc.setFontSize(12);
-    doc.setTextColor(22, 101, 52);
-    doc.text(
-      `${parseFloat(report.total_ingreso_bruto).toFixed(2)}`,
-      margin + 3,
-      yPos + 13
-    );
-    if (churchEnabled) {
-      doc.setFontSize(8);
-      doc.setTextColor(22, 163, 74);
-      doc.text(
-        `Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}`,
-        margin + 3,
-        yPos + 18
-      );
-    }
-
-    // Gastos
-    const xPosRight = margin + (pageWidth - 2 * margin - 5) / 2 + 5;
-    doc.setFillColor(254, 242, 242); // Rojo claro
-    doc.roundedRect(
-      xPosRight,
-      yPos,
-      (pageWidth - 2 * margin - 5) / 2,
-      20,
-      2,
-      2,
-      "F"
-    );
-    doc.setFontSize(9);
-    doc.setTextColor(153, 27, 27);
-    doc.setFont(undefined, "bold");
-    doc.text("GASTOS", xPosRight + 3, yPos + 6);
-    doc.setFontSize(12);
-    doc.setTextColor(153, 27, 27);
-    doc.text(
-      `${parseFloat(report.total_gastos).toFixed(2)}`,
-      xPosRight + 3,
-      yPos + 13
-    );
-
-    yPos += 30;
-
-    if (churchEnabled) {
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont(undefined, "bold");
-      doc.text("Compromisos Anuales", margin, yPos);
-      yPos += 10;
-
-      doc.setFillColor(250, 245, 255); // Morado claro
-      doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 25, 2, 2, "F");
-
-      const colWidth = (pageWidth - 2 * margin) / 3;
-      doc.setFontSize(8);
-      doc.setTextColor(124, 58, 237);
-      doc.text("Diezmos", margin + 5, yPos + 7);
-      doc.text("Ofrendas", margin + colWidth + 5, yPos + 7);
-      doc.text("Total", margin + 2 * colWidth + 5, yPos + 7);
-
-      doc.setFontSize(11);
-      doc.setTextColor(88, 28, 135);
-      doc.setFont(undefined, "bold");
-      doc.text(
-        `${parseFloat(report.total_diezmos).toFixed(2)}`,
-        margin + 5,
-        yPos + 15
-      );
-      doc.text(
-        `${parseFloat(report.total_ofrendas).toFixed(2)}`,
-        margin + colWidth + 5,
-        yPos + 15
-      );
-      doc.text(
-        `${parseFloat(report.total_iglesia).toFixed(2)}`,
-        margin + 2 * colWidth + 5,
-        yPos + 15
-      );
-
-      yPos += 35;
-    }
-
-    // Promedios Mensuales
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("Promedios Mensuales", margin, yPos);
-    yPos += 10;
-
-    // Promedio Ingresos
-    doc.setFillColor(219, 234, 254); // Azul claro
-    doc.roundedRect(
-      margin,
-      yPos,
-      (pageWidth - 2 * margin - 5) / 2,
-      15,
-      2,
-      2,
-      "F"
-    );
-    doc.setFontSize(8);
-    doc.setTextColor(30, 64, 175);
-    doc.text("Promedio Ingresos", margin + 3, yPos + 5);
-    doc.setFontSize(11);
-    doc.setTextColor(30, 58, 138);
-    doc.setFont(undefined, "bold");
-    doc.text(
-      `${(parseFloat(report.total_ingreso_bruto) / 12).toFixed(2)}`,
-      margin + 3,
-      yPos + 12
-    );
-
-    // Promedio Gastos
-    doc.setFillColor(254, 215, 170); // Naranja claro
-    doc.roundedRect(
-      xPosRight,
-      yPos,
-      (pageWidth - 2 * margin - 5) / 2,
-      15,
-      2,
-      2,
-      "F"
-    );
-    doc.setFontSize(8);
-    doc.setTextColor(194, 65, 12);
-    doc.text("Promedio Gastos", xPosRight + 3, yPos + 5);
-    doc.setFontSize(11);
-    doc.setTextColor(154, 52, 18);
-    doc.setFont(undefined, "bold");
-    doc.text(
-      `${(parseFloat(report.total_gastos) / 12).toFixed(2)}`,
-      xPosRight + 3,
-      yPos + 12
-    );
-
-    yPos += 25;
-
-    // Footer
-    addLine(pageHeight - 20);
-    doc.setFontSize(8);
-    doc.setTextColor(107, 114, 128);
-    doc.setFont(undefined, "normal");
-    const footerText = `MyFinances - Generado el ${new Date().toLocaleDateString(
-      "es-ES",
-      { year: "numeric", month: "long", day: "numeric" }
-    )}`;
-    addCenteredText(footerText, pageHeight - 12, 8);
-
-    // Guardar PDF
-    doc.save(`Reporte_Anual_${report.year}_MyFinances.pdf`);
   };
 
   return (
@@ -391,7 +165,7 @@ export default function AnnualReport() {
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Balance Anual</p>
                     <p className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                      ${parseFloat(report.liquidacion_final).toFixed(2)}
+                      {`$${report.liquidacion_final.toFixed(2)}`}
                     </p>
                   </div>
                   <div className="text-right">
@@ -412,11 +186,11 @@ export default function AnnualReport() {
                       Ingresos Bruto
                     </p>
                     <p className="text-2xl font-bold text-green-800">
-                      ${parseFloat(report.total_ingreso_bruto).toFixed(2)}
+                      {`$${report.total_ingreso_bruto.toFixed(2)}`}
                     </p>
                     {churchEnabled && (
                       <p className="text-xs text-green-600 mt-1">
-                        Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}
+                        {`Neto: $${report.total_ingreso_neto.toFixed(2)}`}
                       </p>
                     )}
                   </div>
@@ -427,7 +201,7 @@ export default function AnnualReport() {
                       Gastos
                     </p>
                     <p className="text-2xl font-bold text-red-800">
-                      ${parseFloat(report.total_gastos).toFixed(2)}
+                      {`$${report.total_gastos.toFixed(2)}`}
                     </p>
                   </div>
                 </div>
@@ -441,19 +215,19 @@ export default function AnnualReport() {
                       <div>
                         <p className="text-xs text-purple-600">Diezmos</p>
                         <p className="text-lg font-bold text-purple-900">
-                          ${parseFloat(report.total_diezmos).toFixed(2)}
+                          {`$${report.total_diezmos.toFixed(2)}`}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-purple-600">Ofrendas</p>
                         <p className="text-lg font-bold text-purple-900">
-                          ${parseFloat(report.total_ofrendas).toFixed(2)}
+                          {`$${report.total_ofrendas.toFixed(2)}`}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-purple-600">Total</p>
                         <p className="text-lg font-bold text-purple-900">
-                          ${parseFloat(report.total_iglesia).toFixed(2)}
+                          {`$${report.total_iglesia.toFixed(2)}`}
                         </p>
                       </div>
                     </div>
@@ -467,8 +241,7 @@ export default function AnnualReport() {
                       Promedio Mensual Ingresos
                     </p>
                     <p className="text-xl font-bold text-blue-800">
-                      $
-                      {(parseFloat(report.total_ingreso_bruto) / 12).toFixed(2)}
+                      {`$${(report.total_ingreso_bruto / 12).toFixed(2)}`}
                     </p>
                   </div>
                   <div className="text-center p-4 bg-orange-50 rounded-xl">
@@ -476,40 +249,21 @@ export default function AnnualReport() {
                       Promedio Mensual Gastos
                     </p>
                     <p className="text-xl font-bold text-orange-800">
-                      ${(parseFloat(report.total_gastos) / 12).toFixed(2)}
+                      {`$${(report.total_gastos / 12).toFixed(2)}`}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Botones de acción */}
             <div className="flex gap-3">
               <button
-                onClick={handleGeneratePDF}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                  />
-                </svg>
-                <span>Descargar PDF</span>
-              </button>
-              <button
+                type="button"
                 onClick={() => {
                   setReport(null);
                   setSelectedYear("");
                 }}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold border border-gray-300"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold border border-gray-300"
               >
                 <svg
                   className="w-5 h-5"

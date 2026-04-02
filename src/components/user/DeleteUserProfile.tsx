@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, type ChangeEventHandler } from "react";
+import { USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE } from "@interfaces";
 import { deleteUserProfile, logoutUser } from "@services";
+import { getErrorMessage } from "@utils/error";
+
+/**
+ * Sin props en la versión actual: el borrado usa la sesión (cookie HttpOnly).
+ * Exportado para documentación / extensiones futuras.
+ */
+export type DeleteUserProfileFormProps = Record<string, never>;
 
 export default function DeleteUserProfileForm() {
-  const [confirmation, setConfirmation] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [confirmation, setConfirmation] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleConfirmationChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setConfirmation(e.target.value);
+    setError("");
+  };
 
   const handleDelete = async () => {
-    if (confirmation.trim().toLowerCase() !== "eliminar") {
+    if (
+      confirmation.trim().toLowerCase() !==
+      USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE
+    ) {
       setError("Debes escribir 'eliminar' para confirmar.");
       return;
     }
@@ -23,8 +39,8 @@ export default function DeleteUserProfileForm() {
         /* cookie puede quedar inválida igualmente */
       }
       window.location.href = "/";
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "No se pudo eliminar la cuenta"));
     } finally {
       setLoading(false);
     }
@@ -102,15 +118,13 @@ export default function DeleteUserProfileForm() {
                 <input
                   type="text"
                   value={confirmation}
-                  onChange={(e) => {
-                    setConfirmation(e.target.value);
-                    setError(""); // Limpiar error al escribir
-                  }}
+                  onChange={handleConfirmationChange}
                   className="w-full p-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-lg"
                   placeholder="Escribe 'eliminar' aquí"
                   disabled={loading}
                 />
-                {confirmation.trim().toLowerCase() === "eliminar" && (
+                {confirmation.trim().toLowerCase() ===
+                  USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE && (
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
@@ -146,7 +160,11 @@ export default function DeleteUserProfileForm() {
 
               <button
                 onClick={handleDelete}
-                disabled={loading || confirmation.trim().toLowerCase() !== "eliminar"}
+                disabled={
+                  loading ||
+                  confirmation.trim().toLowerCase() !==
+                    USER_ACCOUNT_DELETE_CONFIRMATION_PHRASE
+                }
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-red-600 to-orange-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none"
               >
                 {loading ? (

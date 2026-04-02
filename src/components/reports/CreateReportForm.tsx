@@ -1,17 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, type SubmitEventHandler } from "react";
+import type { ICategory, ICreateReportFormState, IReportPayload } from "@interfaces";
 import { createReport, fetchCategories } from "@services";
+import { getErrorMessage } from "@utils/error";
 import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
+
+const defaultForm = (): ICreateReportFormState => ({
+  month: "",
+  year: new Date().getFullYear(),
+  ingresos: [{ categoria_id: "", concepto: "", monto: "" }],
+  gastos: [{ categoria_id: "", concepto: "", monto: "" }],
+  porcentaje_ofrenda: "",
+});
 
 export default function CreateReportForm() {
   const churchEnabled = useChurchContributions();
-  const [categories, setCategories] = useState([]);
-  const [formData, setFormData] = useState({
-    month: "",
-    year: new Date().getFullYear(),
-    ingresos: [{ categoria_id: "", concepto: "", monto: "" }],
-    gastos: [{ categoria_id: "", concepto: "", monto: "" }],
-    porcentaje_ofrenda: "",
-  });
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [formData, setFormData] = useState<ICreateReportFormState>(defaultForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -20,13 +24,17 @@ export default function CreateReportForm() {
     gastos: false,
   });
 
-  const handleInputChange = (section, index, field, value) => {
+  type SectionKey = "ingresos" | "gastos";
+  type LineField = "categoria_id" | "concepto" | "monto";
+
+  const handleInputChange = (section: SectionKey, index: number, field: LineField, value: string) => {
     const newData = [...formData[section]];
-    newData[index][field] = value;
+    const row = { ...newData[index], [field]: value };
+    newData[index] = row;
     setFormData((prev) => ({ ...prev, [section]: newData }));
   };
 
-  const addEntry = (section) => {
+  const addEntry = (section: SectionKey) => {
     setFormData((prev) => ({
       ...prev,
       [section]: [
@@ -40,21 +48,21 @@ export default function CreateReportForm() {
     }));
   };
 
-  const removeEntry = (section, index) => {
+  const removeEntry = (section: SectionKey, index: number) => {
     setFormData((prev) => ({
       ...prev,
       [section]: prev[section].filter((_, i) => i !== index),
     }));
   };
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: keyof typeof collapsedSections) => {
     setCollapsedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -65,9 +73,9 @@ export default function CreateReportForm() {
         ? (parseFloat(formData.porcentaje_ofrenda) || 0) / 100
         : 0;
 
-      const payload = {
-        ...formData,
-        year: parseInt(formData.year, 10),
+      const payload: IReportPayload = {
+        month: formData.month,
+        year: parseInt(String(formData.year), 10),
         ingresos: formData.ingresos.map((i) => ({
           ...(i.categoria_id ? { categoria_id: i.categoria_id } : {}),
           concepto: i.concepto || "",
@@ -83,9 +91,11 @@ export default function CreateReportForm() {
 
       await createReport(payload);
       setSuccess("¡Reporte creado exitosamente!");
-      setTimeout(() => (window.location.href = "/dashboard"), 1500);
-    } catch (err) {
-      setError(err.message);
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Error al crear el reporte"));
     } finally {
       setLoading(false);
     }
@@ -104,16 +114,16 @@ export default function CreateReportForm() {
   }, []);
 
   const categoriesByType = useMemo(() => {
-    const ingreso = [];
-    const gasto = [];
+    const ingreso: ICategory[] = [];
+    const gasto: ICategory[] = [];
     for (const c of categories) {
-      if (c?.tipo === "ingreso") ingreso.push(c);
-      else if (c?.tipo === "gasto") gasto.push(c);
+      if (c.tipo === "ingreso") ingreso.push(c);
+      else if (c.tipo === "gasto") gasto.push(c);
     }
     return { ingreso, gasto };
   }, [categories]);
 
-  const getSectionTotal = (section) => {
+  const getSectionTotal = (section: SectionKey) => {
     return formData[section].reduce((sum, item) => sum + (parseFloat(item.monto) || 0), 0);
   };
 
@@ -156,9 +166,13 @@ export default function CreateReportForm() {
               <input
                 type="number"
                 value={formData.year}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, year: e.target.value }))
-                }
+                onChange={(e) => {
+                  const n = e.target.valueAsNumber;
+                  setFormData((prev) => ({
+                    ...prev,
+                    year: Number.isNaN(n) ? prev.year : n,
+                  }));
+                }}
                 className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />

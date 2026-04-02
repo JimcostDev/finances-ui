@@ -1,8 +1,16 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
-const ChurchContributionsContext = createContext(false);
+const ChurchContributionsContext = createContext<boolean>(false);
 
-export function ChurchContributionsProvider({ children, enabled }) {
+interface ChurchContributionsProviderProps {
+  children: ReactNode;
+  enabled: boolean;
+}
+
+export function ChurchContributionsProvider({
+  children,
+  enabled,
+}: ChurchContributionsProviderProps) {
   return (
     <ChurchContributionsContext.Provider value={Boolean(enabled)}>
       {children}

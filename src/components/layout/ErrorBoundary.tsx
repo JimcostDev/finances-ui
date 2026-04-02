@@ -1,4 +1,5 @@
-import React, { ErrorInfo, ReactNode } from "react";
+import React from "react";
+import type { ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -81,7 +82,7 @@ class ErrorBoundary extends React.Component<Props, State> {
                 </div>
 
                 {/* Detalles técnicos (colapsables) */}
-                {this.state.errorInfo && process.env.NODE_ENV === "development" && (
+                {this.state.errorInfo && import.meta.env.DEV && (
                   <details className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                     <summary className="cursor-pointer font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

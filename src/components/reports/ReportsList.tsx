@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
+import type { IReport } from "@interfaces";
 import { fetchReports } from "@services";
 import { getErrorMessage } from "@utils/error";
 import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
 
 export default function ReportsList() {
   const churchEnabled = useChurchContributions();
-  const [reports, setReports] = useState([]);
+  const [reports, setReports] = useState<IReport[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, year
@@ -13,12 +14,11 @@ export default function ReportsList() {
   useEffect(() => {
     fetchReports()
       .then((data) => {
-        // Asegurarse de que data sea un array
         setReports(Array.isArray(data) ? data : []);
         setLoading(false);
       })
-      .catch((err) => {
-        setError(err.message);
+      .catch((err: unknown) => {
+        setError(getErrorMessage(err, "Error al cargar reportes"));
         setLoading(false);
       });
   }, []);

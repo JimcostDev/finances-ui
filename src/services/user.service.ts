@@ -5,8 +5,8 @@ export async function fetchUserProfile(): Promise<IUser> {
   return apiJson<IUser>("/api/users/profile", { method: "GET" });
 }
 
-export async function updateUserProfile(userData: IUpdateUserPayload): Promise<unknown> {
-  return apiJson<unknown>("/api/users/profile", {
+export async function updateUserProfile(userData: IUpdateUserPayload): Promise<IUser> {
+  return apiJson<IUser>("/api/users/profile", {
     method: "PUT",
     body: JSON.stringify(userData),
   });

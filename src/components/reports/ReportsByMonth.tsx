@@ -1,4 +1,5 @@
 import React, { useState, type SubmitEventHandler } from "react";
+import type { IReport } from "@interfaces";
 import { fetchReportsByMonth } from "@services";
 import { getErrorMessage } from "@utils/error";
 import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
@@ -22,17 +23,17 @@ export default function ReportsByMonth() {
   const churchEnabled = useChurchContributions();
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-  const [reports, setReports] = useState([]);
+  const [reports, setReports] = useState<IReport[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const handleFetch = async (month, year) => {
+  const handleFetch = async (month: string, year: number) => {
     setLoading(true);
     setError("");
     try {
       const data = await fetchReportsByMonth(month, year);
-      setReports(data);
-    } catch (err) {
-      setError(err.message || "Error al obtener reportes");
+      setReports(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Error al obtener reportes"));
     }
     setLoading(false);
   };
@@ -51,7 +52,7 @@ export default function ReportsByMonth() {
     const month = monthOptions[now.getMonth()];
     const year = now.getFullYear();
     setSelectedMonth(month);
-    setSelectedYear(year);
+    setSelectedYear(String(year));
     handleFetch(month, year);
   };
 

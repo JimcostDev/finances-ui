@@ -57,7 +57,9 @@ export default function Dashboard() {
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
 
   return (
-    <ChurchContributionsProvider enabled={userData?.enable_church_contributions}>
+    <ChurchContributionsProvider
+      enabled={Boolean(userData?.enable_church_contributions)}
+    >
       <DashboardLayout
         userData={userData}
         currentView={currentView}

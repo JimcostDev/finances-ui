@@ -25,5 +25,8 @@ export {
   updateUserProfile,
 } from "./user.service";
 
-export type { IReportPayload as ReportPayload } from "../interfaces";
-export type { IUpdateUserPayload as UpdateUserPayload } from "../interfaces";
+export type {
+  IFinancialSummary,
+  IReportPayload as ReportPayload,
+  IUpdateUserPayload as UpdateUserPayload,
+} from "../interfaces";

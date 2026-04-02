@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
+import type { IFinancialSummary } from "@interfaces";
 import { fetchGeneralBalance } from "@services";
 import { getErrorMessage } from "@utils/error";
 import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
 
 export default function GeneralBalance() {
   const churchEnabled = useChurchContributions();
-  const [report, setReport] = useState(null);
+  const [report, setReport] = useState<IFinancialSummary | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -14,8 +15,8 @@ export default function GeneralBalance() {
       try {
         const data = await fetchGeneralBalance();
         setReport(data);
-      } catch (err) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "Error al cargar el balance"));
       } finally {
         setLoading(false);
       }
@@ -23,89 +24,6 @@ export default function GeneralBalance() {
 
     loadBalance();
   }, []);
-
-  const handleGeneratePDF = async () => {
-    const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 20;
-    let yPos = margin;
-
-    const addCenteredText = (text, y, fontSize = 12, isBold = false) => {
-      doc.setFontSize(fontSize);
-      if (isBold) doc.setFont(undefined, "bold");
-      else doc.setFont(undefined, "normal");
-      const textWidth = doc.getTextWidth(text);
-      doc.text(text, (pageWidth - textWidth) / 2, y);
-    };
-
-    // Header (Azul consistente con AnnualReport)
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, pageWidth, 40, "F");
-    doc.setTextColor(255, 255, 255);
-    addCenteredText("Balance General Histórico", 20, 20, true);
-    addCenteredText(`MyFinances - Acumulado Total`, 30, 12);
-
-    yPos = 50;
-    doc.setTextColor(0, 0, 0);
-
-    // Balance destacado
-    doc.setFillColor(239, 246, 255); // Azul claro
-    doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 25, 3, 3, "F");
-    doc.setFontSize(10);
-    doc.setTextColor(107, 114, 128);
-    doc.text("Liquidación Total Acumulada", margin + 5, yPos + 8);
-    doc.setFontSize(18);
-    doc.setTextColor(37, 99, 235);
-    doc.setFont(undefined, "bold");
-    doc.text(`${parseFloat(report.liquidacion_final).toFixed(2)}`, margin + 5, yPos + 20);
-
-    yPos += 35;
-
-    // Métricas
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("Resumen Financiero", margin, yPos);
-    yPos += 10;
-
-    // Ingresos (Con Neto agregado)
-    doc.setFillColor(240, 253, 244); // Verde claro
-    doc.roundedRect(margin, yPos, (pageWidth - 2 * margin - 5) / 2, 20, 2, 2, "F");
-    doc.setFontSize(9);
-    doc.setTextColor(21, 128, 61); // Verde oscuro
-    doc.setFont(undefined, "bold");
-    doc.text("INGRESOS BRUTO", margin + 3, yPos + 6);
-    doc.setFontSize(12);
-    doc.setTextColor(22, 101, 52);
-    doc.text(`${parseFloat(report.total_ingreso_bruto).toFixed(2)}`, margin + 3, yPos + 13);
-    if (churchEnabled) {
-      doc.setFontSize(8);
-      doc.setTextColor(22, 163, 74);
-      doc.text(`Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}`, margin + 3, yPos + 18);
-    }
-
-    // Gastos
-    const xPosRight = margin + (pageWidth - 2 * margin - 5) / 2 + 5;
-    doc.setFillColor(254, 242, 242); // Rojo claro
-    doc.roundedRect(xPosRight, yPos, (pageWidth - 2 * margin - 5) / 2, 20, 2, 2, "F");
-    doc.setFontSize(9);
-    doc.setTextColor(153, 27, 27); // Rojo oscuro
-    doc.setFont(undefined, "bold");
-    doc.text("TOTAL GASTOS", xPosRight + 3, yPos + 6);
-    doc.setFontSize(12);
-    doc.setTextColor(153, 27, 27);
-    doc.text(`${parseFloat(report.total_gastos).toFixed(2)}`, xPosRight + 3, yPos + 13);
-
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(107, 114, 128);
-    doc.setFont(undefined, "normal");
-    addCenteredText(`Generado el ${new Date().toLocaleDateString()}`, pageHeight - 12, 8);
-
-    doc.save(`Balance_General_MyFinances.pdf`);
-  };
 
   if (loading) {
     return (
@@ -147,7 +65,7 @@ export default function GeneralBalance() {
                   <p className="text-sm text-gray-600 mb-1">Liquidación Total</p>
                   {/* Balance con degradado Azul-Verde */}
                   <p className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                    ${parseFloat(report.liquidacion_final).toFixed(2)}
+                    {`$${report.liquidacion_final.toFixed(2)}`}
                   </p>
                 </div>
                 <div className="text-right">
@@ -165,10 +83,10 @@ export default function GeneralBalance() {
                 <div className="bg-green-50 rounded-xl p-4 border border-green-100">
                   <p className="text-xs font-medium text-green-700 mb-1">Ingresos Bruto</p>
                   <p className="text-2xl font-bold text-green-800">
-                    ${parseFloat(report.total_ingreso_bruto).toFixed(2)}
+                    {`$${report.total_ingreso_bruto.toFixed(2)}`}
                   </p>
                   <p className="text-xs text-green-600 mt-1">
-                    Neto: ${parseFloat(report.total_ingreso_neto).toFixed(2)}
+                    {`Neto: $${report.total_ingreso_neto.toFixed(2)}`}
                   </p>
                 </div>
 
@@ -176,7 +94,7 @@ export default function GeneralBalance() {
                 <div className="bg-red-50 rounded-xl p-4 border border-red-100">
                   <p className="text-xs font-medium text-red-700 mb-1">Total Gastos</p>
                   <p className="text-2xl font-bold text-red-800">
-                    ${parseFloat(report.total_gastos).toFixed(2)}
+                    {`$${report.total_gastos.toFixed(2)}`}
                   </p>
                 </div>
               </div>
@@ -187,33 +105,25 @@ export default function GeneralBalance() {
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <p className="text-xs text-purple-600">Diezmos</p>
-                      <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_diezmos).toFixed(2)}</p>
+                      <p className="text-lg font-bold text-purple-900">
+                        {`$${report.total_diezmos.toFixed(2)}`}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-purple-600">Ofrendas</p>
-                      <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_ofrendas).toFixed(2)}</p>
+                      <p className="text-lg font-bold text-purple-900">
+                        {`$${report.total_ofrendas.toFixed(2)}`}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-purple-600">Total</p>
-                      <p className="text-lg font-bold text-purple-900">${parseFloat(report.total_iglesia).toFixed(2)}</p>
+                      <p className="text-lg font-bold text-purple-900">
+                        {`$${report.total_iglesia.toFixed(2)}`}
+                      </p>
                     </div>
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Footer Actions */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100">
-              <button
-                onClick={handleGeneratePDF}
-                // Botón Azul para igualar al reporte anual
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Descargar Reporte General PDF
-              </button>
             </div>
           </div>
         )}

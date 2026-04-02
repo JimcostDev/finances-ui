@@ -1,7 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, type ChangeEventHandler, type SubmitEventHandler } from "react";
+import type { IUser, IUpdateUserPayload } from "@interfaces";
 import { updateUserProfile } from "@services";
+import { getErrorMessage } from "@utils/error";
+import {
+  computePasswordStrength,
+  passwordStrengthBarClass,
+  passwordStrengthLabel,
+} from "@utils/passwordStrength";
 
-export default function EditUserProfileForm({ initialData }) {
+interface EditUserProfileFormProps {
+  initialData: IUser;
+}
+
+export default function EditUserProfileForm({ initialData }: EditUserProfileFormProps) {
   const [form, setForm] = useState({
     fullname: initialData.fullname || "",
     email: initialData.email || "",
@@ -18,25 +29,19 @@ export default function EditUserProfileForm({ initialData }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleChange = (e) => {
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const { name, value } = e.target;
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
 
-    // Calcular fortaleza de contraseña
-    if (e.target.name === "password") {
-      const pass = e.target.value;
-      let strength = 0;
-      if (pass.length >= 8) strength++;
-      if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) strength++;
-      if (/[0-9]/.test(pass)) strength++;
-      if (/[^a-zA-Z0-9]/.test(pass)) strength++;
-      setPasswordStrength(strength);
+    if (name === "password") {
+      setPasswordStrength(computePasswordStrength(value));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setMessage({ text: "", type: "" });
 
@@ -53,8 +58,9 @@ export default function EditUserProfileForm({ initialData }) {
 
     setLoading(true);
     try {
-      // Crear payload solo con los campos que tienen datos
-      const payload = {};
+      const payload: IUpdateUserPayload = {
+        enable_church_contributions: enableChurchContributions,
+      };
       if (form.fullname) payload.fullname = form.fullname;
       if (form.email) payload.email = form.email;
       if (form.username) payload.username = form.username;
@@ -63,35 +69,17 @@ export default function EditUserProfileForm({ initialData }) {
         payload.confirm_password = form.confirm_password;
       }
 
-      payload.enable_church_contributions = enableChurchContributions;
-
       await updateUserProfile(payload);
       setMessage({ text: "¡Perfil actualizado exitosamente!", type: "success" });
 
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1500);
-    } catch (err) {
-      setMessage({ text: err.message || "Error al actualizar el perfil", type: "error" });
+    } catch (err: unknown) {
+      setMessage({ text: getErrorMessage(err, "Error al actualizar el perfil"), type: "error" });
     } finally {
       setLoading(false);
     }
-  };
-
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength === 0) return "bg-gray-200";
-    if (passwordStrength === 1) return "bg-red-500";
-    if (passwordStrength === 2) return "bg-yellow-500";
-    if (passwordStrength === 3) return "bg-blue-500";
-    return "bg-green-500";
-  };
-
-  const getPasswordStrengthText = () => {
-    if (passwordStrength === 0) return "";
-    if (passwordStrength === 1) return "Débil";
-    if (passwordStrength === 2) return "Regular";
-    if (passwordStrength === 3) return "Buena";
-    return "Excelente";
   };
 
   return (
@@ -293,14 +281,14 @@ export default function EditUserProfileForm({ initialData }) {
                         <div
                           key={level}
                           className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                            level <= passwordStrength ? getPasswordStrengthColor() : "bg-gray-200"
+                            level <= passwordStrength ? passwordStrengthBarClass(passwordStrength) : "bg-gray-200"
                           }`}
                         />
                       ))}
                     </div>
                     {passwordStrength > 0 && (
                       <p className="text-xs text-gray-600">
-                        Contraseña: <span className="font-semibold">{getPasswordStrengthText()}</span>
+                        Contraseña: <span className="font-semibold">{passwordStrengthLabel(passwordStrength)}</span>
                       </p>
                     )}
                   </div>
