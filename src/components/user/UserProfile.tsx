@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { fetchUserProfile } from "@services";
 
 const ProfileItem = ({ icon, label, value }) => (
-  <div className="group p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200">
+  <div className="group p-4 hover:bg-linear-to-r hover:from-blue-50 hover:to-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200">
     <div className="flex items-start gap-4">
-      <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+      <div className="w-10 h-10 bg-linear-to-br from-blue-100 to-green-100 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
         <span className="text-xl">{icon}</span>
       </div>
       <div className="flex-1">
@@ -38,7 +38,7 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600 font-medium">Cargando perfil...</p>
@@ -49,7 +49,7 @@ export default function UserProfile() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-red-200">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,14 +70,14 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header con avatar y acciones */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* Banner superior */}
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-green-600 relative">
+          <div className="h-32 bg-linear-to-r from-blue-600 to-green-600 relative">
             <div className="absolute -bottom-16 left-8">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-green-600 rounded-2xl shadow-xl flex items-center justify-center border-4 border-white">
+              <div className="w-32 h-32 bg-linear-to-br from-blue-600 to-green-600 rounded-2xl shadow-xl flex items-center justify-center border-4 border-white">
                 <span className="text-5xl font-bold text-white">
                   {userData.fullname.charAt(0).toUpperCase()}
                 </span>

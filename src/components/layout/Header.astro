@@ -1,5 +1,5 @@
 ---
-import { API_BASE_URL } from "../config/apiUrl.ts";
+import { API_BASE_URL } from "../../config/apiUrl.ts";
 
 const currentPath = Astro.url.pathname;
 const apiUrl = API_BASE_URL;
@@ -22,10 +22,10 @@ if (hideHeader) {
     <div class="flex justify-between items-center h-16">
       <!-- Logo y nombre -->
       <a href="/" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+        <div class="w-10 h-10 bg-linear-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
           <span class="text-white text-xl font-bold">$</span>
         </div>
-        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent hidden sm:block">
+        <span class="text-xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent hidden sm:block">
           MyFinances
         </span>
       </a>
@@ -54,7 +54,7 @@ if (hideHeader) {
             </a>
             <a
               href="/register"
-              class="px-5 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white font-medium rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+              class="px-5 py-2 bg-linear-to-r from-blue-600 to-green-600 text-white font-medium rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
             >
               Crear Cuenta
             </a>

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, type SubmitEventHandler } from "react";
 import { fetchReportsByMonth } from "@services";
-import { useChurchContributions } from "./ChurchContributionsContext";
+import { getErrorMessage } from "@utils/error";
+import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
 
 const monthOptions = [
   "enero",
@@ -36,7 +37,7 @@ export default function ReportsByMonth() {
     setLoading(false);
   };
 
-  const handleManualSubmit = (e) => {
+  const handleManualSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     if (!selectedMonth || !selectedYear) {
       setError("Por favor, selecciona mes y año.");
@@ -59,7 +60,7 @@ export default function ReportsByMonth() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 space-y-2">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
             Consultar Reportes
           </h2>
           <p className="text-gray-600">
@@ -72,7 +73,7 @@ export default function ReportsByMonth() {
           {/* Botón fecha actual */}
           <button
             onClick={handleCurrentDate}
-            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="w-full flex items-center justify-center gap-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -144,7 +145,7 @@ export default function ReportsByMonth() {
             {/* Botón buscar */}
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -164,7 +165,7 @@ export default function ReportsByMonth() {
           {/* Error state */}
           {error && !loading && (
             <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-red-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               <p className="text-red-700 font-medium">{error}</p>
@@ -202,7 +203,7 @@ export default function ReportsByMonth() {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-gray-600 mb-1">Balance Final</p>
-                        <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                        <p className="text-2xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
                           ${report.liquidacion.toFixed(2)}
                         </p>
                       </div>
@@ -288,7 +289,7 @@ export default function ReportsByMonth() {
         {/* Botón flotante para volver */}
         <a
           href="/dashboard"
-          className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-full shadow-2xl hover:shadow-3xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-linear-to-r from-blue-600 to-green-600 text-white rounded-full shadow-2xl hover:shadow-3xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 z-50"
           title="Volver al Dashboard"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,24 +1,79 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { createReport, fetchCategories } from "@services";
-import { useChurchContributions } from "./ChurchContributionsContext";
+import React, { useMemo, useState, useEffect } from "react";
+import { fetchCategories, fetchUserProfile, getReportById, updateReport } from "@services";
 
-export default function CreateReportForm() {
-  const churchEnabled = useChurchContributions();
+export default function EditReportForm({ reportId }) {
+  const [formData, setFormData] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [formData, setFormData] = useState({
-    month: "",
-    year: new Date().getFullYear(),
-    ingresos: [{ categoria_id: "", concepto: "", monto: "" }],
-    gastos: [{ categoria_id: "", concepto: "", monto: "" }],
-    porcentaje_ofrenda: "",
-  });
-  const [loading, setLoading] = useState(false);
+  const [churchEnabled, setChurchEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [collapsedSections, setCollapsedSections] = useState({
     ingresos: false,
     gastos: false,
   });
+
+  useEffect(() => {
+    const loadReport = async () => {
+      try {
+        if (
+          typeof reportId !== "string" ||
+          !/^[0-9a-fA-F]{24}$/.test(reportId)
+        ) {
+          throw new Error(`ID inválido: ${reportId}`);
+        }
+
+        const [profile, report, cats] = await Promise.all([
+          fetchUserProfile(),
+          getReportById(reportId),
+          fetchCategories(),
+        ]);
+
+        setChurchEnabled(Boolean(profile.enable_church_contributions));
+        setCategories(Array.isArray(cats) ? cats : []);
+
+        const normalizeEntries = (arr) => {
+          if (!Array.isArray(arr)) return [];
+          return arr.map((e) => {
+            const id = e?.id || e?._id || "";
+            const categoria_id = e?.categoria_id || "";
+            return {
+              ...e,
+              id,
+              _id: e?._id || id,
+              categoria_id,
+              concepto: e?.concepto || "",
+              monto: e?.monto ?? "",
+            };
+          });
+        };
+
+        setFormData({
+          ...report,
+          ingresos: normalizeEntries(report.ingresos),
+          gastos: normalizeEntries(report.gastos),
+          porcentaje_ofrenda: report.porcentaje_ofrenda * 100,
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadReport();
+  }, [reportId]);
+
+  const categoriesByType = useMemo(() => {
+    const ingreso = [];
+    const gasto = [];
+    for (const c of categories) {
+      if (c?.tipo === "ingreso") ingreso.push(c);
+      else if (c?.tipo === "gasto") gasto.push(c);
+    }
+    return { ingreso, gasto };
+  }, [categories]);
 
   const handleInputChange = (section, index, field, value) => {
     const newData = [...formData[section]];
@@ -35,6 +90,8 @@ export default function CreateReportForm() {
           categoria_id: "",
           concepto: "",
           monto: "",
+          id: `new-${Date.now()}`,
+          _id: `new-${Date.now()}`,
         },
       ],
     }));
@@ -56,7 +113,7 @@ export default function CreateReportForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
     setError("");
     setSuccess("");
 
@@ -69,49 +126,55 @@ export default function CreateReportForm() {
         ...formData,
         year: parseInt(formData.year, 10),
         ingresos: formData.ingresos.map((i) => ({
-          ...(i.categoria_id ? { categoria_id: i.categoria_id } : {}),
-          concepto: i.concepto || "",
+          ...(i?.id && /^[0-9a-fA-F]{24}$/.test(i.id) ? { id: i.id } : {}),
+          ...(i?.categoria_id ? { categoria_id: i.categoria_id } : {}),
+          concepto: i?.concepto || "",
           monto: Math.abs(parseFloat(i.monto)) || 0,
         })),
         gastos: formData.gastos.map((g) => ({
-          ...(g.categoria_id ? { categoria_id: g.categoria_id } : {}),
-          concepto: g.concepto || "",
+          ...(g?.id && /^[0-9a-fA-F]{24}$/.test(g.id) ? { id: g.id } : {}),
+          ...(g?.categoria_id ? { categoria_id: g.categoria_id } : {}),
+          concepto: g?.concepto || "",
           monto: Math.abs(parseFloat(g.monto)) || 0,
         })),
         porcentaje_ofrenda: ofrendaPct,
       };
 
-      await createReport(payload);
-      setSuccess("¡Reporte creado exitosamente!");
+      await updateReport(reportId, payload);
+      setSuccess("¡Reporte actualizado exitosamente!");
       setTimeout(() => (window.location.href = "/dashboard"), 1500);
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const cats = await fetchCategories();
-        setCategories(Array.isArray(cats) ? cats : []);
-      } catch {
-        setCategories([]);
-      }
-    };
-    loadCategories();
-  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600 font-medium">Cargando reporte...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const categoriesByType = useMemo(() => {
-    const ingreso = [];
-    const gasto = [];
-    for (const c of categories) {
-      if (c?.tipo === "ingreso") ingreso.push(c);
-      else if (c?.tipo === "gasto") gasto.push(c);
-    }
-    return { ingreso, gasto };
-  }, [categories]);
+  if (!formData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p className="text-red-600 font-medium">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const getSectionTotal = (section) => {
     return formData[section].reduce((sum, item) => sum + (parseFloat(item.monto) || 0), 0);
@@ -125,10 +188,10 @@ export default function CreateReportForm() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
-                Crear Nuevo Reporte
+                Editar Reporte
               </h2>
-              <p className="text-gray-600 text-sm">
-                Registra tus ingresos y gastos del mes
+              <p className="text-gray-600 capitalize">
+                {formData.month} {formData.year}
               </p>
             </div>
 
@@ -142,7 +205,6 @@ export default function CreateReportForm() {
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
-                <option value="">Seleccionar mes</option>
                 {[
                   "enero", "febrero", "marzo", "abril", "mayo", "junio",
                   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -176,8 +238,8 @@ export default function CreateReportForm() {
                       porcentaje_ofrenda: e.target.value,
                     }))
                   }
-                  className="w-30 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="% Ofrenda"
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="% Ofr"
                   title="Porcentaje de Ofrenda"
                   required
                 />
@@ -238,7 +300,7 @@ export default function CreateReportForm() {
                 <div className="max-h-96 overflow-y-auto p-3 space-y-2">
                   {formData.ingresos.map((entry, index) => (
                     <div
-                      key={index}
+                      key={entry.id || entry._id || index}
                       className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                       <select
@@ -344,7 +406,7 @@ export default function CreateReportForm() {
                 <div className="max-h-96 overflow-y-auto p-3 space-y-2">
                   {formData.gastos.map((entry, index) => (
                     <div
-                      key={index}
+                      key={entry.id || entry._id || index}
                       className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                       <select
@@ -405,7 +467,7 @@ export default function CreateReportForm() {
           {/* Mensajes de estado */}
           {error && (
             <div className="flex items-center gap-2 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               <span className="font-medium">{error}</span>
@@ -414,7 +476,7 @@ export default function CreateReportForm() {
 
           {success && (
             <div className="flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span className="font-medium">{success}</span>
@@ -426,26 +488,26 @@ export default function CreateReportForm() {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => window.location.href = "/dashboard"}
+                onClick={() => window.history.back()}
                 className="flex-1 py-3 px-6 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                disabled={loading}
-                className="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={saving}
+                className="flex-1 py-3 px-6 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
+                {saving ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Creando...
+                    Guardando...
                   </span>
                 ) : (
-                  "Crear Reporte"
+                  "Guardar Cambios"
                 )}
               </button>
             </div>

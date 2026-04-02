@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import type { ChangeEventHandler, SubmitEventHandler } from "react";
 import { fetchAuthMe, loginUser } from "@services";
+import { getErrorMessage } from "@utils/error";
 
 export default function LoginForm() {
   const [credentials, setCredentials] = useState({
@@ -26,14 +28,15 @@ export default function LoginForm() {
     };
   }, []);
 
-  const handleChange = (e) => {
-    setCredentials({
-      ...credentials,
-      [e.target.name]: e.target.value
-    });
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setMessage("");
     setIsLoading(true);
@@ -47,15 +50,15 @@ export default function LoginForm() {
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1000);
-    } catch (error) {
-      setMessage(error.message || "Error al iniciar sesión. Verifica tus credenciales.");
+    } catch (error: unknown) {
+      setMessage(getErrorMessage(error, "Error al iniciar sesión. Verifica tus credenciales."));
       setIsLoading(false);
     }
   };
 
   if (!sessionChecked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-green-50">
         <div className="text-center space-y-3">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-gray-600 text-sm">Comprobando sesión…</p>
@@ -65,16 +68,16 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-green-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         {/* Card principal */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-gray-100">
           {/* Header con icono */}
           <div className="text-center space-y-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-2xl flex items-center justify-center mx-auto transform hover:scale-110 transition-transform duration-300">
+            <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-green-600 rounded-2xl flex items-center justify-center mx-auto transform hover:scale-110 transition-transform duration-300">
               <span className="text-white text-2xl font-bold">$</span>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
               Bienvenido de vuelta
             </h2>
             <p className="text-gray-500 text-sm">
@@ -159,11 +162,11 @@ export default function LoginForm() {
                   : "bg-red-50 text-red-700 border border-red-200"
               }`}>
                 {message.includes("Bienvenido") ? (
-                  <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 ) : (
-                  <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 )}
@@ -176,7 +179,7 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? (
                   <>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchGeneralBalance } from "@services";
-import { useChurchContributions } from "./ChurchContributionsContext";
+import { getErrorMessage } from "@utils/error";
+import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
 
 export default function GeneralBalance() {
   const churchEnabled = useChurchContributions();

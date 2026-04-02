@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
+import type { IAuthUser } from "@interfaces";
 import { fetchAuthMe, logoutUser } from "@services";
+import { getErrorMessage } from "@utils/error";
 
 import { ChurchContributionsProvider } from "./ChurchContributionsContext";
 import DashboardLayout from "./DashboardLayout";
-import ReportsByMonth from "./ReportsByMonth";
-import AnnualReport from "./AnnualReport";
-import GeneralBalance from "./GeneralBalance"; 
-import ViewSelector from "./ViewSelector";
-import UserProfile from "./UserProfile";
-import CreateReportForm from "./CreateReportForm";
+import AnnualReport from "../reports/AnnualReport";
+import CreateReportForm from "../reports/CreateReportForm";
+import GeneralBalance from "../reports/GeneralBalance";
+import ReportsByMonth from "../reports/ReportsByMonth";
+import ViewSelector from "../reports/ViewSelector";
+import UserProfile from "../user/UserProfile";
 
 export default function Dashboard() {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<IAuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
@@ -22,8 +24,8 @@ export default function Dashboard() {
       try {
         const data = await fetchAuthMe();
         setUserData(data);
-      } catch (err) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(getErrorMessage(err));
         window.location.href = "/login";
       } finally {
         setLoading(false);

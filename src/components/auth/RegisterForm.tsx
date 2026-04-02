@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import type { ChangeEventHandler, SubmitEventHandler } from "react";
 import { registerUser } from "@services";
+import { getErrorMessage } from "@utils/error";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -15,7 +17,7 @@ export default function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleChange = (e) => {
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value
@@ -33,7 +35,7 @@ export default function RegisterForm() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setMessage({ text: "", type: "" });
 
@@ -60,8 +62,8 @@ export default function RegisterForm() {
         window.location.href = "/login";
       }, 1500);
 
-    } catch (error) {
-      setMessage({ text: error.message || "Error al crear la cuenta", type: "error" });
+    } catch (error: unknown) {
+      setMessage({ text: getErrorMessage(error, "Error al crear la cuenta"), type: "error" });
       setIsLoading(false);
     }
   };
@@ -83,16 +85,16 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-green-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         {/* Card principal */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-gray-100">
           {/* Header con icono */}
           <div className="text-center space-y-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-2xl flex items-center justify-center mx-auto transform hover:scale-110 transition-transform duration-300">
+            <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-green-600 rounded-2xl flex items-center justify-center mx-auto transform hover:scale-110 transition-transform duration-300">
               <span className="text-white text-2xl font-bold">$</span>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
               Crea tu cuenta
             </h2>
             <p className="text-gray-500 text-sm">
@@ -290,11 +292,11 @@ export default function RegisterForm() {
                   : "bg-green-50 text-green-700 border border-green-200"
               }`}>
                 {message.type === "error" ? (
-                  <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 ) : (
-                  <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 )}
@@ -307,7 +309,7 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? (
                   <>

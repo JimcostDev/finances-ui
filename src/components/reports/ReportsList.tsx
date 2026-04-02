@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchReports } from "@services";
-import { useChurchContributions } from "./ChurchContributionsContext";
+import { getErrorMessage } from "@utils/error";
+import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
 
 export default function ReportsList() {
   const churchEnabled = useChurchContributions();
@@ -35,7 +36,7 @@ export default function ReportsList() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600 font-medium">Cargando reportes...</p>
@@ -47,7 +48,7 @@ export default function ReportsList() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-red-200">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +71,7 @@ export default function ReportsList() {
   // Empty state
   if (!Array.isArray(reports) || reports.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +82,7 @@ export default function ReportsList() {
           <p className="text-gray-600 mb-6">Comienza a agregar tus ingresos y gastos para generar reportes</p>
           <a 
             href="/create-report"
-            className="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+            className="inline-block px-6 py-3 bg-linear-to-r from-blue-600 to-green-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
           >
             Ir a Crear Reporte
           </a>
@@ -91,12 +92,12 @@ export default function ReportsList() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 space-y-4">
           <div className="text-center space-y-2">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
               Mis Reportes Financieros
             </h2>
             <p className="text-gray-600">
@@ -144,7 +145,7 @@ export default function ReportsList() {
               className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden group"
             >
               {/* Header del Card */}
-              <div className="bg-gradient-to-br from-gray-50 to-white p-6 border-b border-gray-200">
+              <div className="bg-linear-to-br from-gray-50 to-white p-6 border-b border-gray-200">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-2xl font-bold capitalize text-gray-900">
@@ -157,7 +158,7 @@ export default function ReportsList() {
                 {/* Liquidación destacada */}
                 <div className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-sm">
                   <p className="text-sm text-gray-600 mb-1">Balance Final</p>
-                  <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                  <p className="text-3xl font-bold bg-linear-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
                     ${report.liquidacion.toFixed(2)}
                   </p>
                 </div>
@@ -259,7 +260,7 @@ export default function ReportsList() {
         {/* Botón flotante para volver */}
         <a
           href="/dashboard"
-          className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-full shadow-2xl hover:shadow-3xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-linear-to-r from-blue-600 to-green-600 text-white rounded-full shadow-2xl hover:shadow-3xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 z-50"
           title="Volver al Dashboard"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

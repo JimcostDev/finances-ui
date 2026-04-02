@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, type SubmitEventHandler } from "react";
 import { fetchAnnualReport } from "@services";
-import { useChurchContributions } from "./ChurchContributionsContext";
+import { getErrorMessage } from "@utils/error";
+import { useChurchContributions } from "../dashboard/ChurchContributionsContext";
 
 export default function AnnualReport() {
   const churchEnabled = useChurchContributions();
@@ -20,7 +21,7 @@ export default function AnnualReport() {
     setLoading(false);
   };
 
-  const handleManualSubmit = (e) => {
+  const handleManualSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     if (!selectedYear) {
       setError("Por favor, selecciona un año.");

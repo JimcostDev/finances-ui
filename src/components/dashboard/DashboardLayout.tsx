@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, type ReactNode } from "react";
+import type { IUser } from "@interfaces";
 
-export default function DashboardLayout({ 
-  userData, 
-  currentView, 
-  setCurrentView, 
-  handleLogout, 
-  children 
-}) {
+interface DashboardLayoutProps {
+  userData: IUser | null;
+  currentView: string;
+  setCurrentView: (id: string) => void;
+  handleLogout: () => void | Promise<void>;
+  children: ReactNode;
+}
+
+export default function DashboardLayout({
+  userData,
+  currentView,
+  setCurrentView,
+  handleLogout,
+  children,
+}: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // los ítems del menú 
