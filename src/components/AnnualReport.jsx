@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fetchAnnualReport } from "@utils/api";
+import { fetchAnnualReport } from "@services";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function AnnualReport() {

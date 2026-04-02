@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUserProfile } from '@utils/api';
+import { fetchUserProfile } from "@services";
 
 const ProfileItem = ({ icon, label, value }) => (
   <div className="group p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200">

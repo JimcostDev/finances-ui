@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { deleteReport } from '../utils/api';
+import { deleteReport } from "@services";
 
 export default function DeleteReportForm({ reportId }) {
   const [confirmation, setConfirmation] = useState('');

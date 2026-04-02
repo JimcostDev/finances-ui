@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { fetchAuthMe } from "@utils/api";
+import { fetchAuthMe } from "@services";
 
 /**
  * Si ya hay sesión (cookie HttpOnly válida), envía al dashboard.

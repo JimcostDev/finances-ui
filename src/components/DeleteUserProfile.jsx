@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { deleteUserProfile, logoutUser } from "../utils/api";
+import { deleteUserProfile, logoutUser } from "@services";
 
 export default function DeleteUserProfileForm() {
   const [confirmation, setConfirmation] = useState("");

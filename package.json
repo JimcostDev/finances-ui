@@ -8,6 +8,9 @@
     "preview": "astro preview",
     "astro": "astro"
   },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
   "dependencies": {
     "@astrojs/react": "^5.0.2",
     "@astrojs/vercel": "^10.0.4",

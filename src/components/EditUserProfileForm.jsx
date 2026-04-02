@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { updateUserProfile } from "../utils/api";
+import { updateUserProfile } from "@services";
 
 export default function EditUserProfileForm({ initialData }) {
   const [form, setForm] = useState({

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fetchReportsByMonth } from "../utils/api";
+import { fetchReportsByMonth } from "@services";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
 const monthOptions = [

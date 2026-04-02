@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUserProfile } from '@utils/api';
+import { fetchUserProfile } from "@services";
 import EditUserProfileForm from './EditUserProfileForm';
 
 export default function EditUserProfilePage() {

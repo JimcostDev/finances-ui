@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchReports } from "@utils/api";
+import { fetchReports } from "@services";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function ReportsList() {

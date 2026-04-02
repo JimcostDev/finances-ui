@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchGeneralBalance } from "../utils/api";
+import { fetchGeneralBalance } from "@services";
 import { useChurchContributions } from "./ChurchContributionsContext";
 
 export default function GeneralBalance() {

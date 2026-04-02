@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchAuthMe, logoutUser } from "../utils/api";
+import { fetchAuthMe, logoutUser } from "@services";
 
 import { ChurchContributionsProvider } from "./ChurchContributionsContext";
 import DashboardLayout from "./DashboardLayout";

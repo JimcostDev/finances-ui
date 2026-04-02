@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchAuthMe, loginUser } from "@utils/api";
+import { fetchAuthMe, loginUser } from "@services";
 
 export default function LoginForm() {
   const [credentials, setCredentials] = useState({

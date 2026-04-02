@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { fetchCategories, fetchUserProfile, getReportById, updateReport } from "../utils/api";
+import { fetchCategories, fetchUserProfile, getReportById, updateReport } from "@services";
 
 export default function EditReportForm({ reportId }) {
   const [formData, setFormData] = useState(null);
