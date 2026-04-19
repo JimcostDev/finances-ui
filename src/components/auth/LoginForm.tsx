@@ -7,8 +7,18 @@ import { getErrorMessage } from "@utils/error";
 function getSafeRedirectPath(): string | null {
   if (typeof window === "undefined") return null;
   const raw = new URLSearchParams(window.location.search).get("redirect");
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return null;
-  return raw;
+  if (!raw) return null;
+
+  try {
+    const url = new URL(raw, window.location.origin);
+    if (url.origin === window.location.origin) {
+      return url.pathname + url.search + url.hash;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 }
 
 const inputClass =
