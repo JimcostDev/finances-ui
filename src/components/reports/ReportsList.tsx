@@ -26,6 +26,13 @@ export default function ReportsList() {
     clearFilters,
   } = useReportsFilters(reports);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterYear, filterMonth]);
+
   useEffect(() => {
     fetchReports()
       .then((data) => {
@@ -94,6 +101,12 @@ export default function ReportsList() {
     );
   }
 
+  const totalPages = Math.ceil(sortedFilteredReports.length / itemsPerPage);
+  const currentReports = sortedFilteredReports.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -111,109 +124,144 @@ export default function ReportsList() {
         {sortedFilteredReports.length === 0 ? (
           <ReportsFilteredEmpty onClearFilters={clearFilters} />
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-            {sortedFilteredReports.map((report) => (
-              <div
-                key={report.id}
-                className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
-              >
-                <div className="border-b border-gray-200 bg-linear-to-br from-gray-50 to-white p-6">
-                  <div className="mb-4 flex items-start justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold capitalize text-gray-900">{report.month}</h3>
-                      <p className="text-lg font-semibold text-gray-600">{report.year}</p>
+          <>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {currentReports.map((report) => (
+                <div
+                  key={report.id}
+                  className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
+                >
+                  <div className="border-b border-gray-200 bg-linear-to-br from-gray-50 to-white p-6">
+                    <div className="mb-4 flex items-start justify-between">
+                      <div>
+                        <h3 className="text-2xl font-bold capitalize text-gray-900">{report.month}</h3>
+                        <p className="text-lg font-semibold text-gray-600">{report.year}</p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border-2 border-gray-200 bg-white p-4 shadow-sm">
+                      <p className="mb-1 text-sm text-gray-600">Balance Final</p>
+                      <Title as="p" size="md">
+                        ${report.liquidacion.toFixed(2)}
+                      </Title>
                     </div>
                   </div>
 
-                  <div className="rounded-xl border-2 border-gray-200 bg-white p-4 shadow-sm">
-                    <p className="mb-1 text-sm text-gray-600">Balance Final</p>
-                    <Title as="p" size="md">
-                      ${report.liquidacion.toFixed(2)}
-                    </Title>
+                  <div className="space-y-4 p-6">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-green-100 bg-green-50 p-3">
+                        <div className="mb-2 flex items-center gap-2">
+                          <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="text-xs font-semibold text-green-700">Ingresos</p>
+                        </div>
+                        <p className="text-lg font-bold text-green-800">${report.total_ingreso_bruto.toFixed(2)}</p>
+                        <p className="mt-1 text-xs text-green-600">Neto: ${report.ingresos_netos.toFixed(2)}</p>
+                      </div>
+
+                      <div className="rounded-xl border border-red-100 bg-red-50 p-3">
+                        <div className="mb-2 flex items-center gap-2">
+                          <svg className="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L11 9.586V6a1 1 0 10-2 0v3.586L7.707 7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="text-xs font-semibold text-red-700">Gastos</p>
+                        </div>
+                        <p className="text-lg font-bold text-red-800">${report.total_gastos.toFixed(2)}</p>
+                      </div>
+                    </div>
+
+                    {churchEnabled && (
+                      <div className="rounded-xl border border-purple-100 bg-purple-50 p-4">
+                        <div className="mb-3 flex items-center gap-2">
+                          <svg className="h-4 w-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                          </svg>
+                          <p className="text-sm font-semibold text-purple-700">Compromisos</p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <p className="text-xs text-purple-600">Diezmos</p>
+                            <p className="text-sm font-bold text-purple-900">${report.diezmos.toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-purple-600">Ofrendas</p>
+                            <p className="text-sm font-bold text-purple-900">${report.ofrendas.toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-purple-600">Total</p>
+                            <p className="text-sm font-bold text-purple-900">${report.iglesia.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 pt-2">
+                      <a
+                        href={`/edit-report/${report.id}`}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 font-medium text-amber-700 transition-all duration-200 hover:bg-amber-100 group-hover:border-amber-300"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span className="text-sm">Editar</span>
+                      </a>
+                      <a
+                        href={`/delete-report/${report.id}`}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 font-medium text-red-700 transition-all duration-200 hover:bg-red-100 group-hover:border-red-300"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span className="text-sm">Eliminar</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                <div className="space-y-4 p-6">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-green-100 bg-green-50 p-3">
-                      <div className="mb-2 flex items-center gap-2">
-                        <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <p className="text-xs font-semibold text-green-700">Ingresos</p>
-                      </div>
-                      <p className="text-lg font-bold text-green-800">${report.total_ingreso_bruto.toFixed(2)}</p>
-                      <p className="mt-1 text-xs text-green-600">Neto: ${report.ingresos_netos.toFixed(2)}</p>
-                    </div>
-
-                    <div className="rounded-xl border border-red-100 bg-red-50 p-3">
-                      <div className="mb-2 flex items-center gap-2">
-                        <svg className="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L11 9.586V6a1 1 0 10-2 0v3.586L7.707 7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <p className="text-xs font-semibold text-red-700">Gastos</p>
-                      </div>
-                      <p className="text-lg font-bold text-red-800">${report.total_gastos.toFixed(2)}</p>
-                    </div>
-                  </div>
-
-                  {churchEnabled && (
-                    <div className="rounded-xl border border-purple-100 bg-purple-50 p-4">
-                      <div className="mb-3 flex items-center gap-2">
-                        <svg className="h-4 w-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                        </svg>
-                        <p className="text-sm font-semibold text-purple-700">Compromisos</p>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <p className="text-xs text-purple-600">Diezmos</p>
-                          <p className="text-sm font-bold text-purple-900">${report.diezmos.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-purple-600">Ofrendas</p>
-                          <p className="text-sm font-bold text-purple-900">${report.ofrendas.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-purple-600">Total</p>
-                          <p className="text-sm font-bold text-purple-900">${report.iglesia.toFixed(2)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 pt-2">
-                    <a
-                      href={`/edit-report/${report.id}`}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 font-medium text-amber-700 transition-all duration-200 hover:bg-amber-100 group-hover:border-amber-300"
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Anterior
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-medium transition-colors ${currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                        }`}
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      <span className="text-sm">Editar</span>
-                    </a>
-                    <a
-                      href={`/delete-report/${report.id}`}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 font-medium text-red-700 transition-all duration-200 hover:bg-red-100 group-hover:border-red-300"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      <span className="text-sm">Eliminar</span>
-                    </a>
-                  </div>
+                      {page}
+                    </button>
+                  ))}
                 </div>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Siguiente
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>
