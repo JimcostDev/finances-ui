@@ -9,7 +9,7 @@ Frontend web para gestionar finanzas personales: reportes mensuales y anuales, b
 | [Astro](https://astro.build/) 6 | Páginas `.astro`, modo `server` (SSR) |
 | [React](https://react.dev/) 19 | Formularios y vistas interactivas (islas) |
 | [Tailwind CSS](https://tailwindcss.com/) 4 | Estilos (`@tailwindcss/vite`) |
-| TypeScript 5 | Tipado estricto (`astro/tsconfigs/strict`) |
+| TypeScript  | Tipado estricto (`astro/tsconfigs/strict`) |
 | [@astrojs/vercel](https://docs.astro.build/en/guides/integrations-guide/vercel/) | Despliegue en Vercel |
 
 Las peticiones al backend usan `fetch` con `credentials: "include"` para enviar la cookie de sesión.
